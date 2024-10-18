@@ -1,0 +1,76 @@
+﻿@page "/Alumnos"
+@inject IHttpServicios http
+@inject HttpClient Http
+
+<PageTitle>Alumnos</PageTitle>
+
+<h1>Alumnos</h1>
+
+<p>BUSCAR ALUMNOS</p>
+
+<div>
+    <input @bind="nombre" placeholder="Nombre" />
+    <input @bind="apellido" placeholder="Apellido" />
+    <input @bind="documento" placeholder="Documento" />
+    <input @bind="cohorte" type="number" placeholder="Cohorte" />
+    <button @onclick="Buscar">Buscar</button>
+</div>
+
+@if (alumnos != null && alumnos.Count > 0)
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Documento</th>
+                <th>Cohorte</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var alumno in alumnos)
+            {
+                <tr>
+                    <td>@alumno.Usuario.Persona.Nombre</td>
+                    <td>@alumno.Usuario.Persona.Apellido</td>
+                    <td>@alumno.Usuario.Persona.Documento</td>
+                    <td>@alumno.InscripcionesCarreras.FirstOrDefault()?.Cohorte</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (isSearchTriggered)
+{
+    <p>No se encontraron alumnos.</p>
+}
+
+@code {
+    private string? nombre;
+    private string? apellido;
+    private string? documento;
+    private int? cohorte;
+    private List<Alumno>? alumnos;
+    private bool isSearchTriggered = false;
+
+    private async Task Buscar()
+    {
+        var response = await Http.GetAsync($"api/alumnos/buscar?nombre={nombre}&apellido={apellido}&documento={documento}&cohorte={cohorte}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            alumnos = await response.Content.ReadFromJsonAsync<List<Alumno>>();
+        }
+        else
+        {
+            alumnos = null; // O manejar el error de forma diferente
+        }
+
+        isSearchTriggered = true;
+    }
+}
+
+
+
+
+   
