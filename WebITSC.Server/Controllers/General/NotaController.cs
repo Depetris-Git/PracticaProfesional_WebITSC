@@ -65,18 +65,18 @@ namespace WebITSC.Server.Controllers.General
 
         //}
 
-        //[HttpGet("GetNotasByTurno/{turnoId}")]
-        //public async Task<IActionResult> GetNotasByTurno(int turnoId)
-        //{
-        //    var notas = await repositorio.SelectNotasByTurno(turnoId);
+        [HttpGet("GetNotasByTurno/{turnoId}")]
+        public async Task<IActionResult> GetNotasByTurno(int turnoId)
+        {
+            var notas = await eRepositorio.SelectNotasByTurno(turnoId);
 
-        //    if (notas == null || !notas.Any())
-        //    {
-        //        return NotFound("No se encontraron notas para el TurnoId proporcionado.");
-        //    }
+            if (notas == null || !notas.Any())
+            {
+                return NotFound("No se encontraron notas para el TurnoId proporcionado.");
+            }
 
-        //    return Ok(notas);
-        //}
+            return Ok(notas);
+        }
 
         #endregion
 
