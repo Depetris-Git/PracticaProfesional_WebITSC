@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\Profesores\**" />
+    <Content Remove="Controllers\Profesores\**" />
+    <EmbeddedResource Remove="Controllers\Profesores\**" />
+    <None Remove="Controllers\Profesores\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10">
@@ -19,7 +26,6 @@
   <ItemGroup>
     <Folder Include="Controllers\Administracion\" />
     <Folder Include="Controllers\Alumnos\" />
-    <Folder Include="Controllers\Profesores\" />
   </ItemGroup>
 
   <ItemGroup>
