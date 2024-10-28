@@ -3,6 +3,7 @@ using WebITSC.DB.Data;
 using WebITSC.DB.Data.Entity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using WebITSC.Admin.Client.Servicios;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,8 @@ builder.Services.AddControllers();
 
 //servicio Client
 builder.Services.AddRazorPages();
+builder.Services.AddScoped<IHttpServicios, HttpServicios>();
+builder.Services.AddHttpClient();
 
 //SERVICIO DE MAPPER
 builder.Services.AddAutoMapper(typeof(Program));

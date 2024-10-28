@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebITSC.DB.Data;
 using WebITSC.DB.Data.Entity;
-using Microsoft.EntityFrameworkCore;
-
 using AutoMapper;
 using WebITSC.Admin.Server.Repositorio;
 using WebITSC.Shared.General.DTO;
@@ -78,8 +75,8 @@ namespace WebITSC.Server.Controllers.General
 
 
 
-        //GET: api/alumnos/buscar
-        [HttpGet("buscar")]
+        
+        [HttpGet("buscar")] //api/Alumnos/buscar
         public async Task<ActionResult<IEnumerable<Alumno>>> BuscarAlumnos(
             [FromQuery] string? nombre,
             [FromQuery] string? apellido,
