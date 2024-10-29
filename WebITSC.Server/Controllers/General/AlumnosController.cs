@@ -48,34 +48,7 @@ namespace WebITSC.Server.Controllers.General
         }
         #region Peticiones Get
 
-        //[HttpGet]
-        //public async Task<ActionResult<List<Alumno>>> Get()
-        //{
-        //    return await repositorio.Select();
-        //}
 
-        //[HttpGet("{id:int}")]
-        //public async Task<ActionResult<Alumno>> Get(int id)
-        //{
-        //    Alumno? sel = await repositorio.SelectById(id);
-        //    if (sel == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return sel;
-        //}
-
-        //[HttpGet("existe/{id:int}")]
-        //public async Task<ActionResult<bool>> Existe(int id)
-        //{
-        //    var existe = await repositorio.Existe(id);
-        //    return existe;
-
-        //}
-
-
-
-        
         [HttpGet("buscar")] //api/Alumnos/buscar
         public async Task<ActionResult<IEnumerable<Alumno>>> BuscarAlumnos(
             [FromQuery] string? nombre,
@@ -92,10 +65,6 @@ namespace WebITSC.Server.Controllers.General
 
             return Ok(alumnos.Value);
         }
-
-
-
-
 
         #endregion
 

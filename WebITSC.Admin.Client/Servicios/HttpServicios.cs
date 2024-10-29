@@ -24,19 +24,6 @@ namespace WebITSC.Admin.Client.Servicios
             }
         }
 
-        public async Task<HttpRespuesta<T>> BuscarAlumnos<T>(string url) //https://localhost:7223/api/Alumnos/buscar
-        {
-            var response = await http.GetAsync(url);
-            if (response.IsSuccessStatusCode)
-            {
-                var respuesta = await DesSerializar<T>(response);
-                return new HttpRespuesta<T>(respuesta, false, response);
-            }
-            else
-            {
-                return new HttpRespuesta<T>(default, true, response);
-            }
-        }
 
         private async Task<T?> DesSerializar<T>(HttpResponseMessage response)
         {

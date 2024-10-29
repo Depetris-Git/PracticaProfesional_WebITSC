@@ -15,37 +15,6 @@
     <button @onclick="BuscarAlumnos">Buscar</button>
 </div>
 
-@* @if (alumnos != null && alumnos.Count > 0)
-{
-    <table>
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Documento</th>
-                <th>Cohorte</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var alumno in alumnos)
-            {
-                <tr>
-                    <td>@alumno.Usuario.Persona.Nombre</td>
-                    <td>@alumno.Usuario.Persona.Apellido</td>
-                    <td>@alumno.Usuario.Persona.Documento</td>
-                    <td>@alumno.InscripcionesCarreras.FirstOrDefault()?.Cohorte</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else if (isSearchTriggered)
-{
-    <p>No se encontraron alumnos.</p>
-}  *@
-
-
-
 
 <table>
     @if (Mensaje == "")
@@ -66,10 +35,8 @@ else if (isSearchTriggered)
                     <td>@alumno.Usuario.Persona.Nombre</td>
                     <td>@alumno.Usuario.Persona.Apellido</td>
                     <td>@alumno.Usuario.Persona.Documento</td>
-                    <td>@alumno.InscripcionesCarreras.FirstOrDefault()?.Cohorte</td>
-                    
+                    <td>@alumno.InscripcionesCarreras.FirstOrDefault()?.Cohorte</td>  
                 </tr>
-
             }
         }
     }
@@ -81,51 +48,14 @@ else if (isSearchTriggered)
 
 
 
-
-@* @if (alumnos != null && alumnos.Any())
-{
-    <table>
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Documento</th>
-                <th>Cohorte</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var alumno in alumnos)
-            {
-                <tr>
-                    <td>@alumno.Usuario.Persona.Nombre</td>
-                    <td>@alumno.Usuario.Persona.Apellido</td>
-                    <td>@alumno.Usuario.Persona.Documento</td>
-                    <td>@alumno.InscripcionesCarreras.FirstOrDefault()?.Cohorte</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>No se encontraron resultados.</p>
-} *@
-
-
-
-
-
-
 @code {
     string? nombre;
     string? apellido;
     string? documento;
     int? cohorte;
     List<Alumno>? alumnos;
-    Alumno alumno;
+    Alumno alumno = new Alumno();
     string Mensaje = "";
-
-    private bool isSearchTriggered = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -133,57 +63,6 @@ else
         await BuscarAlumnos();
     }
 
-
-
-    //-------------------codigo original--------------------
-    // private async Task Buscar()
-    // {
-    //     var response = await Http.GetAsync($"api/alumnos/buscar?nombre={nombre}&apellido={apellido}&documento={documento}&cohorte={cohorte}");
-
-    //     if (response.IsSuccessStatusCode)
-    //     {
-    //         alumnos = await response.Content.ReadFromJsonAsync<List<Alumno>>();
-    //     }
-    //     else
-    //     {
-    //         alumnos = null; // O manejar el error de forma diferente
-    //     }
-
-    //     isSearchTriggered = true;
-    // }
-
-    //------------------------prueba que no funciono---------------
-    // private async Task Buscar()
-    // {
-    //     try
-    //     {
-    //         var response = await Http.GetAsync("api/alumnos/buscar");
-    //         response.EnsureSuccessStatusCode();
-    //         var responseBody = await response.Content.ReadAsStringAsync();
-    //         alumnos = JsonSerializer.Deserialize<List<Alumno>>(responseBody);
-    //     }
-    //     catch (HttpRequestException httpEx)
-    //     {
-    //         Console.WriteLine($"Request error: {httpEx.Message}");
-    //     }
-    //     catch (JsonException jsonEx)
-    //     {
-    //         Console.WriteLine($"JSON error: {jsonEx.Message}");
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         Console.WriteLine($"Unexpected error: {ex.Message}");
-    //     }
-    // }
-
-
-
-
-
-
-
-   
-        // private bool isLoading = false;
 
         private async Task BuscarAlumnos()
         {
@@ -198,28 +77,7 @@ else
         {
             Mensaje = await resp.ObtenerError();
         }
-
-
-
-
-            // isLoading = true;
-            // try
-            // {
-            //     // Llamada al endpoint del controlador
-            //     alumnos = await Http.BuscarAlumno<List<Alumno>>($"/api/Alumnos/buscar");
-            // }
-            // catch (Exception ex)
-            // {
-            //     // Manejo de errores
-            //     Console.WriteLine($"Error: {ex.Message}");
-            // }
-            // finally
-            // {
-            //     isLoading = false;
-            // }
         }
-
-
 }
 
 
