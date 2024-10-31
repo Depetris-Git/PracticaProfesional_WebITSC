@@ -32,10 +32,10 @@
             @foreach (var alumno in alumnos )
             {
                 <tr>
-                    <td>@alumno.Usuario.Persona.Nombre</td>
-                    <td>@alumno.Usuario.Persona.Apellido</td>
-                    <td>@alumno.Usuario.Persona.Documento</td>
-                    <td>@alumno.InscripcionesCarreras.FirstOrDefault()?.Cohorte</td>  
+                    <td>@alumno?.Usuario?.Persona?.Nombre</td>
+                    <td>@alumno?.Usuario?.Persona?.Apellido</td>
+                    <td>@alumno?.Usuario?.Persona?.Documento</td>
+                    <td>@alumno?.InscripcionesCarreras?.FirstOrDefault()?.Cohorte</td>
                 </tr>
             }
         }
@@ -53,7 +53,7 @@
     string? apellido;
     string? documento;
     int? cohorte;
-    List<Alumno>? alumnos;
+    List<Alumno>? alumnos = new List<Alumno>();
     Alumno alumno = new Alumno();
     string Mensaje = "";
 

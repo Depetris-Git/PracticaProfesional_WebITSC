@@ -28,37 +28,74 @@ namespace WebITSC.Admin.Server.Repositorio
                 .ToListAsync();
         }
         //________________________________________________
+
         public async Task<ActionResult<IEnumerable<Alumno>>> BuscarAlumnos(string? nombre, string? apellido, string? documento, int? cohorte)
         {
             var query = context.Alumnos.Include(a => a.Usuario).AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(nombre))
+            if (!string.IsNullOrWhiteSpace(nombre) ||
+                !string.IsNullOrWhiteSpace(apellido) ||
+                !string.IsNullOrWhiteSpace(documento) ||
+                cohorte.HasValue)
             {
-                query = query.Where(a => a.Usuario.Persona.Nombre.Contains(nombre));
+                if (!string.IsNullOrWhiteSpace(nombre))
+                {
+                    query = query.Where(a => a.Usuario.Persona.Nombre.Contains(nombre));
+                }
+
+                if (!string.IsNullOrWhiteSpace(apellido))
+                {
+                    query = query.Where(a => a.Usuario.Persona.Apellido.Contains(apellido));
+                }
+
+                if (!string.IsNullOrWhiteSpace(documento))
+                {
+                    query = query.Where(a => a.Usuario.Persona.Documento.Contains(documento));
+                }
+
+                if (cohorte.HasValue)
+                {
+                    query = query.Where(a => a.InscripcionesCarreras.Any(ic => ic.Cohorte == cohorte));
+                }
             }
-
-            if (!string.IsNullOrWhiteSpace(apellido))
-            {
-                query = query.Where(a => a.Usuario.Persona.Apellido.Contains(apellido));
+            { 
+                var resultados = await query.ToListAsync();
+                return resultados;
             }
-
-            if (!string.IsNullOrWhiteSpace(documento))
-            {
-                query = query.Where(a => a.Usuario.Persona.Documento.Contains(documento));
-            }
-
-
-            if (cohorte.HasValue)
-            {
-                query = query.Where(a => a.InscripcionesCarreras.Any(ic => ic.Cohorte == cohorte));
-            }
-
-            var resultados = await query.ToListAsync();
-
-            return resultados;
+        
         }
 
-        Task<ActionResult<int>> IAlumnoRepositorio.Insert(Alumno entidad)
+            //public async Task<ActionResult<IEnumerable<Alumno>>> BuscarAlumnos(string? nombre, string? apellido, string? documento, int? cohorte)
+            //{
+            //    var query = context.Alumnos.Include(a => a.Usuario).AsQueryable();
+
+            //    if (!string.IsNullOrWhiteSpace(nombre))
+            //    {
+            //        query = query.Where(a => a.Usuario.Persona.Nombre.Contains(nombre));
+            //    }
+
+            //    if (!string.IsNullOrWhiteSpace(apellido))
+            //    {
+            //        query = query.Where(a => a.Usuario.Persona.Apellido.Contains(apellido));
+            //    }
+
+            //    if (!string.IsNullOrWhiteSpace(documento))
+            //    {
+            //        query = query.Where(a => a.Usuario.Persona.Documento.Contains(documento));
+            //    }
+
+
+            //    if (cohorte.HasValue)
+            //    {
+            //        query = query.Where(a => a.InscripcionesCarreras.Any(ic => ic.Cohorte == cohorte));
+            //    }
+
+            //    var resultados = await query.ToListAsync();
+
+            //    return resultados;
+            //}
+
+            Task<ActionResult<int>> IAlumnoRepositorio.Insert(Alumno entidad)
         {
             throw new NotImplementedException();
         }
