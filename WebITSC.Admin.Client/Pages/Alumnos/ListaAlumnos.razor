@@ -11,7 +11,7 @@
     <input @bind="nombre" placeholder="Nombre" />
     <input @bind="apellido" placeholder="Apellido" />
     <input @bind="documento" placeholder="Documento" />
-    <input @bind="cohorte" type="number" placeholder="Cohorte" />
+    <input @bind="cohorte" placeholder="Cohorte" />
     <button @onclick="BuscarAlumnos">Buscar</button>
 </div>
 
@@ -32,10 +32,10 @@
             @foreach (var alumno in alumnos )
             {
                 <tr>
-                    <td>@alumno?.Usuario?.Persona?.Nombre</td>
-                    <td>@alumno?.Usuario?.Persona?.Apellido</td>
-                    <td>@alumno?.Usuario?.Persona?.Documento</td>
-                    <td>@alumno?.InscripcionesCarreras?.FirstOrDefault()?.Cohorte</td>
+                    <td>@alumno.Usuario.Persona?.Nombre</td>
+                    <td>@alumno.Usuario.Persona?.Apellido</td>
+                    <td>@alumno.Usuario.Persona?.Documento</td>
+                    <td>@alumno.InscripcionesCarreras.FirstOrDefault()?.Cohorte</td>
                 </tr>
             }
         }
@@ -49,13 +49,14 @@
 
 
 @code {
-    string? nombre;
-    string? apellido;
-    string? documento;
-    int? cohorte;
+    string nombre;
+    string apellido;
+    string documento;
+    int? cohorte  ;
+    string Mensaje = string.Empty ;
     List<Alumno>? alumnos = new List<Alumno>();
     Alumno alumno = new Alumno();
-    string Mensaje = "";
+    
 
     protected override async Task OnInitializedAsync()
     {
@@ -64,21 +65,37 @@
     }
 
 
-        private async Task BuscarAlumnos()
+    private async Task BuscarAlumnos()
+    {
+        // Construir la URL de consulta con los parámetros
+        var queryParams = new Dictionary<string, string>();
+        if (!string.IsNullOrEmpty(nombre)) queryParams.Add("nombre", nombre);
+        if (!string.IsNullOrEmpty(apellido)) queryParams.Add("apellido", apellido);
+        if (!string.IsNullOrEmpty(documento)) queryParams.Add("documento", documento);
+        if (cohorte.HasValue) queryParams.Add("cohorte", cohorte.Value.ToString());
+
+        // Verificar si todos los campos están vacíos
+        if (!queryParams.Any())
         {
+            Mensaje = "Debe completar al menos un campo de búsqueda.";
+            return;
+        }
 
+        var queryString = string.Join("&", queryParams.Select(x => $"{x.Key}={x.Value}"));
+        var url = $"/api/Alumnos/buscar?{queryString}";
 
-        var resp = await http.Get<List<Alumno>>("/api/Alumnos/buscar");
+        var resp = await http.Get<List<Alumno>>(url);
         if (!resp.Error)
         {
-           alumnos  = resp.Respuesta;
+            alumnos = resp.Respuesta;
         }
         else
         {
             Mensaje = await resp.ObtenerError();
         }
-        }
+    }
 }
+
 
 
 
