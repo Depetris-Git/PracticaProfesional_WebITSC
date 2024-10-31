@@ -13,6 +13,13 @@ builder.Services.AddControllers();
 builder.Services.AddControllers().AddJsonOptions(
     x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = null; // Si necesitas mantener los nombres de propiedades
+    });
+
+
 // servicio controller
 builder.Services.AddControllers();
 
@@ -65,6 +72,8 @@ builder.Services.AddScoped<ITurnoRepositorio, TurnoRepositorio>();
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<IPersonaRepositorio, PersonaRepositorio>();
 
+builder.Services.AddScoped< IHttpServicios, HttpServicios>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -77,10 +86,14 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseBlazorFrameworkFiles();
+
 app.UseStaticFiles();
+
 app.UseRouting();
+
 app.MapRazorPages();
 
+app.UseExceptionHandler("/error"); // Cambia esto para devolver JSON si es necesario
 
 app.UseAuthorization();
 

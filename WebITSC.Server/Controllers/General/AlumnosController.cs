@@ -54,7 +54,7 @@ namespace WebITSC.Server.Controllers.General
             [FromQuery] string? nombre,
             [FromQuery] string? apellido,
             [FromQuery] string? documento,
-            [FromQuery] int? cohorte)
+            [FromQuery] int? cohorte )
         {
             var alumnos = await alumnoRepositorio.BuscarAlumnos(nombre, apellido, documento, cohorte);
 
