@@ -12,8 +12,8 @@ using WebITSC.DB.Data;
 namespace WebITSC.DB.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20241018152518_Principal")]
-    partial class Principal
+    [Migration("20241031215924_inicio")]
+    partial class inicio
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

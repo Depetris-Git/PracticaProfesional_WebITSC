@@ -10,6 +10,11 @@ namespace WebITSC.Admin.Server.UTIL
         public AutoMapperProfiles()
         {
             CreateMap<CrearAlumnoDTO, Alumno>();
+
+            CreateMap<Persona, GetPersonaDTO>().ForMember(dest => dest.Cohorte, opt => opt.MapFrom(src => src.inscripcion_Carrera.Cohorte));
+                
+
+
             CreateMap<CrearCarreraDTO, Carrera>();
             CreateMap<CrearCertificadoAlumnoDTO, CertificadoAlumno>();
             CreateMap<CrearClaseDTO, Clase>();

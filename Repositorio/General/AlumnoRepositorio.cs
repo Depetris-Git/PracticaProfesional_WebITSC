@@ -29,7 +29,7 @@ namespace WebITSC.Admin.Server.Repositorio
         }
         //________________________________________________
 
-        public async Task<ActionResult<IEnumerable<Alumno>>> BuscarAlumnos(string? nombre, string? apellido, string? documento, int? cohorte)
+        public async Task<IEnumerable<Alumno>> BuscarAlumnos(string? nombre, string? apellido, string? documento, int? cohorte)
         {
             var query = context.Alumnos.Include(a => a.Usuario).AsQueryable();
 

@@ -7,13 +7,13 @@
 
 <p>BUSCAR ALUMNOS</p>
 
- <div>
+<div>
     <input @bind="nombre" placeholder="Nombre" />
     <input @bind="apellido" placeholder="Apellido" />
     <input @bind="documento" placeholder="Documento" />
     <input @bind="cohorte" placeholder="Cohorte" />
     <button @onclick="BuscarAlumnos">Buscar</button>
-</div> 
+</div>
 
 
 <table>
@@ -23,13 +23,13 @@
         {
             <p>Buscando....</p>
         }
-        else if( alumnos.Count == 0)
+        else if (alumnos.Count == 0)
         {
             <p>No existen tipos de documentos</p>
         }
         else
         {
-            @foreach (var alumno in alumnos )
+            @foreach (var alumno in alumnos)
             {
                 <tr>
                     <td>@alumno.Usuario.Persona?.Nombre</td>

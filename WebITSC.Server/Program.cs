@@ -4,6 +4,7 @@ using WebITSC.DB.Data.Entity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using WebITSC.Admin.Client.Servicios;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,12 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = null; // Si necesitas mantener los nombres de propiedades
     });
+
+//builder.Services.AddControllers()
+//    .AddJsonOptions(options =>
+//    {
+//        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+//    });
 
 
 // servicio controller

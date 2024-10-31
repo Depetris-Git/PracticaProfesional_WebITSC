@@ -50,7 +50,7 @@ namespace WebITSC.Server.Controllers.General
 
 
         [HttpGet("buscar")] //api/Alumnos/buscar
-        public async Task<ActionResult<IEnumerable<Alumno>>> BuscarAlumnos(
+        public async Task<ActionResult<IEnumerable<GetPersonaDTO>>> BuscarAlumnos(
             [FromQuery] string? nombre,
             [FromQuery] string? apellido,
             [FromQuery] string? documento,
@@ -58,12 +58,16 @@ namespace WebITSC.Server.Controllers.General
         {
             var alumnos = await alumnoRepositorio.BuscarAlumnos(nombre, apellido, documento, cohorte);
 
-            if (alumnos == null || !alumnos.Value.Any())
+            if (alumnos == null || !alumnos.Any())
             {
                 return NotFound("No se encontraron alumnos.");
             }
+            
+            // Mapea los alumnos a GetPersonaDTO
+            var alumnosDTO = alumnos.Select(alumno => mapper.Map<GetPersonaDTO>(alumno)).ToList();
 
-            return Ok(alumnos.Value);
+
+            return Ok(alumnos);
         }
 
         #endregion
