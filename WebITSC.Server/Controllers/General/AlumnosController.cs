@@ -3,6 +3,7 @@ using WebITSC.DB.Data.Entity;
 using AutoMapper;
 using WebITSC.Admin.Server.Repositorio;
 using WebITSC.Shared.General.DTO;
+using WebITSC.Shared.General.DTO.Alumnos;
 
 namespace WebITSC.Server.Controllers.General
 {

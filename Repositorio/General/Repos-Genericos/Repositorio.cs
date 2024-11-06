@@ -15,27 +15,28 @@ namespace WebITSC.Admin.Server.Repositorio
             this.context = context;
         }
 
+        //____________________________________________________________________________________________
         public async Task<bool> Existe(int id)
         {
             var existe = await context.Set<E>()
                              .AnyAsync(x => x.Id == id);
             return existe;
         }
-
+        //____________________________________________________________________________________________
         public async Task<List<E>> Select()
         {
             return await context.Set<E>().ToListAsync();
         }
-
+        //____________________________________________________________________________________________
         public async Task<E> SelectById(int id)
         {
             E? sel = await context.Set<E>()
-                .AsNoTracking()
+                // .AsNoTracking()
                 .FirstOrDefaultAsync(
                 x => x.Id == id);
             return sel;
         }
-
+        //____________________________________________________________________________________________
         public async Task<int> Insert(E entidad)
         {
             try
@@ -50,24 +51,23 @@ namespace WebITSC.Admin.Server.Repositorio
                 throw err;
             }
         }
-
+        //____________________________________________________________________________________
         public async Task<bool> Update(int id, E entidad)
         {
             if (id != entidad.Id)
             {
                 return false;
             }
+            var EntidadExistente = await SelectById(id);
 
-            var pepe = await SelectById(id);
-
-            if (pepe == null)
+            if (EntidadExistente == null)
             {
                 return false;
             }
 
             try
             {
-                context.Set<E>().Update(entidad);
+                context.Entry(EntidadExistente).CurrentValues.SetValues(entidad);
                 await context.SaveChangesAsync();
                 return true;
             }
@@ -76,17 +76,9 @@ namespace WebITSC.Admin.Server.Repositorio
 
                 throw e;
             }
-
         }
-
-        // para ver si existe o no
-        public async Task<bool> EXISTE(int id)
-        {
-
-            var existe = await context.Set<E>().AnyAsync(x => x.Id == id);
-            return existe;
-        }
-
+        //____________________________________________________________________________________________
+        //____________________________________________________________________________________________
         public async Task<bool> Delete(int id)
         {
             var pepe = await SelectById(id);

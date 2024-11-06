@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using WebITSC.DB.Data.Entity;
 using WebITSC.Shared.General.DTO;
+using WebITSC.Shared.General.DTO.Alumnos;
 
 
 namespace WebITSC.Admin.Server.UTIL
