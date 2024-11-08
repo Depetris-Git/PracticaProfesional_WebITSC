@@ -6,5 +6,6 @@ namespace WebITSC.Admin.Server.Repositorio
     {
         Task<List<InscripcionCarrera>> FullGetAll();
         Task<InscripcionCarrera> FullGetById(int id);
+        Task<InscripcionCarrera> GetInscripcionByAlumnoYCarrera(int alumnoId, int carreraId);
     }
 }

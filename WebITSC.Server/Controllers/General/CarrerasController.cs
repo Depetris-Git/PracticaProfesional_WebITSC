@@ -3,7 +3,9 @@ using WebITSC.Admin.Server.Repositorio;
 
 using WebITSC.DB.Data.Entity;
 using Microsoft.AspNetCore.Mvc;
-using WebITSC.Shared.General.DTO;
+using WebITSC.Shared.General.DTO.Carreraa;
+using WebITSC.Shared.General.DTO.Alumnos;
+using Repositorio.General;
 
 namespace WebITSC.Admin.Server.Controllers
 {
@@ -13,45 +15,49 @@ namespace WebITSC.Admin.Server.Controllers
         [Route("api/Carreras")]
         public class CarrerasController : ControllerBase
         {
-            private readonly IRepositorio<Carrera> repositorio;
+            private readonly ICarreraRepositorio eRepositorio;
             private readonly IMapper mapper;
 
-            public CarrerasController(IRepositorio<Carrera> repositorio,
-                                      IMapper mapper)
+            public CarrerasController(ICarreraRepositorio eRepositorio,
+                                                IMapper mapper)
             {
-                this.repositorio = repositorio;
+                this.eRepositorio = eRepositorio;
                 this.mapper = mapper;
             }
 
-
-            #region Peticiones Get
-
             [HttpGet]
-            public async Task<ActionResult<List<Carrera>>> Get()
+            public async Task<ActionResult<List<GetCarreraDTO>>> GetAll()
             {
-                return await repositorio.Select();
+                var carreras = await eRepositorio.Select();
+                return Ok(carreras);
             }
 
             [HttpGet("{id:int}")]
-            public async Task<ActionResult<Carrera>> Get(int id)
+            public async Task<ActionResult<GetCarreraDTO>> Get(int id)
             {
-                Carrera? sel = await repositorio.SelectById(id);
+                // Seleccionamos la entidad Carrera
+                Carrera? sel = await eRepositorio.SelectById(id);
+
                 if (sel == null)
                 {
                     return NotFound();
                 }
-                return sel;
+
+                // Usamos AutoMapper para mapear la entidad Carrera a GetCarreraDTO
+                var carreraDto = mapper.Map<GetCarreraDTO>(sel);
+
+                return Ok(carreraDto);
             }
+
 
             [HttpGet("existe/{id:int}")]
             public async Task<ActionResult<bool>> Existe(int id)
             {
-                var existe = await repositorio.Existe(id);
+                var existe = await eRepositorio.Existe(id);
                 return existe;
 
             }
 
-            #endregion
 
             [HttpPost]
             public async Task<ActionResult<int>> Post(CrearCarreraDTO entidadDTO)
@@ -60,7 +66,7 @@ namespace WebITSC.Admin.Server.Controllers
                 {
                     Carrera entidad = mapper.Map<Carrera>(entidadDTO);
 
-                    return await repositorio.Insert(entidad);
+                    return await eRepositorio.Insert(entidad);
                 }
                 catch (Exception e)
                 {
@@ -75,7 +81,7 @@ namespace WebITSC.Admin.Server.Controllers
                 {
                     return BadRequest("Datos incorrectos");
                 }
-                var sel = await repositorio.SelectById(id);
+                var sel = await eRepositorio.SelectById(id);
                 //sel = Seleccion
 
                 if (sel == null)
@@ -88,7 +94,7 @@ namespace WebITSC.Admin.Server.Controllers
 
                 try
                 {
-                    await repositorio.Update(id, sel);
+                    await eRepositorio.Update(id, sel);
                     return Ok();
                 }
                 catch (Exception e)
@@ -100,7 +106,7 @@ namespace WebITSC.Admin.Server.Controllers
             [HttpDelete("{id:int}")]
             public async Task<ActionResult> Delete(int id)
             {
-                var existe = await repositorio.Existe(id);
+                var existe = await eRepositorio.Existe(id);
                 if (!existe)
                 {
                     return NotFound($"La persona {id} no existe");
@@ -108,7 +114,7 @@ namespace WebITSC.Admin.Server.Controllers
                 Carrera EntidadABorrar = new Carrera();
                 EntidadABorrar.Id = id;
 
-                if (await repositorio.Delete(id))
+                if (await eRepositorio.Delete(id))
                 {
                     return Ok();
                 }

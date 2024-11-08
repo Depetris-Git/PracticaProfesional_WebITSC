@@ -9,7 +9,14 @@ namespace WebITSC.Shared.General.DTO.Alumnos
 {
     public class GetAlumnoDTO
     {
-        public string Id { get; set; }  
+        public int Id { get; set; }
+        public int CarreraId { get; set; }  // Carrera en la que se va a inscribir
+
+        public string NombrePersona { get; set; }
+        public string ApellidoPersona { get; set; }
+        public string DocumentoPersona { get; set; }
+        public string? TelefonoPersona { get; set; }
+        public string DomicilioPersona { get; set; }
         public string Sexo { get; set; }
 
         [Required(ErrorMessage = "La fecha de nacimiento del alumno es necesario")]
@@ -51,20 +58,14 @@ namespace WebITSC.Shared.General.DTO.Alumnos
 
         [MaxLength(40, ErrorMessage = "Máximo número de caracteres {1}.")]
         public string? CUS { get; set; }
-        //public bool Estado { get; set; } = true;
+        
+        public bool Estado { get; set; } = true;
 
         //_persona_____________________________________________________________________ 
         //public string PersonaId { get; set; }
-        public string NombrePersona { get; set; }
-        public string ApellidoPersona { get; set; }
-
-        public string? TelefonoPersona { get; set; }
-        public string DomicilioPersona { get; set; }
-
-        public string DocumentoPersona { get; set; }
 
         //_cohorte_____________________________________________________________________
-        public int Cohorte { get; set; }
+       public int Cohorte { get; set; }
 
     }
 }

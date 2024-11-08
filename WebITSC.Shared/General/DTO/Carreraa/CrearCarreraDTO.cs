@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WebITSC.Shared.General.DTO
+namespace WebITSC.Shared.General.DTO.Carreraa
 {
     public class CrearCarreraDTO
     {
@@ -22,6 +22,6 @@ namespace WebITSC.Shared.General.DTO
         [MaxLength(20, ErrorMessage = "Máximo número de caracteres {1}.")]
         public string Modalidad { get; set; }
 
-        public List<InscripcionCarrera> InscripcionesCarrera { get; set; } = new List<InscripcionCarrera>();
+       // public List<InscripcionCarrera> InscripcionesCarrera { get; set; } = new List<InscripcionCarrera>();
     }
 }

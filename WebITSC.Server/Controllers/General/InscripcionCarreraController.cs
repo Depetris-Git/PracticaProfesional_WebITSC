@@ -4,7 +4,7 @@ using WebITSC.Admin.Server.Repositorio;
 using WebITSC.DB.Data;
 using WebITSC.DB.Data.Entity;
 using Microsoft.AspNetCore.Mvc;
-using WebITSC.Shared.General.DTO;
+using WebITSC.Shared.General.DTO.InscripcionCarrera;
 
 namespace WebITSC.Server.Controllers.General
 {
@@ -23,7 +23,7 @@ namespace WebITSC.Server.Controllers.General
             this.mapper = mapper;
         }
         [HttpGet]
-        public async Task<ActionResult<List<InscripcionCarrera>>> GetAll()
+        public async Task<ActionResult<List<GetIncripcionCarreraDTO>>> GetAll()
         {
             var inscrpicionCarreras = await eRepositorio.FullGetAll();
 
@@ -31,7 +31,7 @@ namespace WebITSC.Server.Controllers.General
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<InscripcionCarrera>> GetById(int id)
+        public async Task<ActionResult<GetIncripcionCarreraDTO>> GetById(int id)
         {
             var inscrpicionCarrera = await eRepositorio.FullGetById(id);
             if (inscrpicionCarrera == null) return NotFound();

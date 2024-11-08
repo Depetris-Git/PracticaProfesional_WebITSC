@@ -81,17 +81,25 @@ namespace WebITSC.Admin.Server.Repositorio
         //____________________________________________________________________________________________
         public async Task<bool> Delete(int id)
         {
-            var pepe = await SelectById(id);
-
-            if (pepe == null)
+            try
             {
-                return false;
-            }
+                var entidad = await SelectById(id);
+                if (entidad == null)
+                {
+                    return false;
+                }
 
-            context.Set<E>().Remove(pepe);
-            await context.SaveChangesAsync();
-            return true;
+                context.Set<E>().Remove(entidad);
+                await context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Log el error (puedes agregar un log adecuado aquí)
+                throw new Exception($"Ocurrió un error al eliminar la entidad con ID {id}: {ex.Message}");
+            }
         }
+
 
 
     }

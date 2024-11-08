@@ -29,5 +29,11 @@ namespace WebITSC.Admin.Server.Repositorio
                 .Include(p => p.Carrera)
                 .ToListAsync();
         }
+        public async Task<InscripcionCarrera> GetInscripcionByAlumnoYCarrera(int alumnoId, int carreraId)
+        {
+            return await context.InscripcionesCarrera
+                .Where(i => i.AlumnoId == alumnoId && i.CarreraId == carreraId)
+                .FirstOrDefaultAsync();
+        }
     }
 }

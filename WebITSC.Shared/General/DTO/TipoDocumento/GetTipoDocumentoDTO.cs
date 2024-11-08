@@ -5,10 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WebITSC.Shared.General.DTO
+namespace WebITSC.Shared.General.DTO.TipoDocumento
 {
-    public class CrearTipoDocumentoDTO
+    public class GetTipoDocumentoDTO
     {
+        public int Id { get; set; } 
+
         [Required(ErrorMessage = "El nombre es necesario")]
         [MaxLength(70, ErrorMessage = "Máximo número de caracteres {1}.")]
         public string Nombre { get; set; }

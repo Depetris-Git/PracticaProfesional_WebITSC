@@ -4,32 +4,66 @@ using WebITSC.DB.Data.Entity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using WebITSC.Admin.Client.Servicios;
+using System.Text.Json;
+using Repositorio.General;
+using WebITSC.Server.Controllers.General;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuración de servicios
-// Añadir controladores y configurar opciones JSON
+// Add services to the container.
+// servicio controller 
+builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(
+    x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.PropertyNamingPolicy = null; // Mantener nombres de propiedades sin cambios
-        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // Para evitar ciclos de referencia
+        options.JsonSerializerOptions.PropertyNamingPolicy = null; // Si necesitas mantener los nombres de propiedades
     });
 
-// Configuración de AutoMapper (solo una vez)
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+//builder.Services.AddControllers()
+//    .AddJsonOptions(options =>
+//    {
+//        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+//    });
 
-// Registrar HttpClient y servicios de cliente
+//swagger
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Mi API", Version = "v1" });
+});
+
+
+// servicio controller
+builder.Services.AddControllers();
+
+
+//servicio Client
+builder.Services.AddRazorPages();
 builder.Services.AddScoped<IHttpServicios, HttpServicios>();
 builder.Services.AddHttpClient();
 
-// Configurar la base de datos
-builder.Services.AddDbContext<Context>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))); // Cambiar a tu cadena de conexión
+//SERVICIO DE MAPPER
+builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-// Registrar repositorios
+
+
+
+builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+
+//servicio que conecta la bd
+builder.Services.AddDbContext<Context>(op => op.UseSqlServer("name=conn"));
+
+builder.Services.AddAutoMapper(typeof(Program));
+
 builder.Services.AddScoped<IAlumnoRepositorio, AlumnoRepositorio>();
-builder.Services.AddScoped<IRepositorio<Carrera>, Repositorio<Carrera>>();
 builder.Services.AddScoped<IRepositorio<CertificadoAlumno>, Repositorio<CertificadoAlumno>>();
 builder.Services.AddScoped<IRepositorio<Clase>, Repositorio<Clase>>();
 builder.Services.AddScoped<IRepositorio<ClaseAsistencia>, Repositorio<ClaseAsistencia>>();
@@ -47,19 +81,18 @@ builder.Services.AddScoped<INotaRepositorio, NotaRepositorio>();
 builder.Services.AddScoped<IRepositorio<Persona>, Repositorio<Persona>>();
 builder.Services.AddScoped<IPlanEstudioRepositorio, PlanEstudioRepositorio>();
 builder.Services.AddScoped<IRepositorio<Profesor>, Repositorio<Profesor>>();
-builder.Services.AddScoped<IRepositorio<TipoDocumento>, Repositorio<TipoDocumento>>();
 builder.Services.AddScoped<ITurnoRepositorio, TurnoRepositorio>();
+
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<IPersonaRepositorio, PersonaRepositorio>();
+builder.Services.AddScoped<ICarreraRepositorio, CarreraRepositorio>();
+builder.Services.AddScoped<ITipoDocumentoRepositorio, TipoDocumentoRepositorio>();   
 
-// Configuración de Swagger/OpenAPI
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddScoped< IHttpServicios, HttpServicios>();
 
-// Construir la aplicación
 var app = builder.Build();
 
-// Configurar el pipeline de solicitud HTTP
+// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -68,19 +101,20 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Servir archivos estáticos y páginas Razor
 app.UseBlazorFrameworkFiles();
+
 app.UseStaticFiles();
 
-// Configurar enrutamiento
 app.UseRouting();
 
-app.MapRazorPages(); // Si usas Razor Pages, habilita esta línea
-app.MapControllers(); // Habilita los controladores de API
+app.MapRazorPages();
 
-app.UseAuthorization(); // Habilitar autorización (si tienes configurado algún sistema de auth)
+app.UseExceptionHandler("/error"); // Cambia esto para devolver JSON si es necesario
 
-app.MapFallbackToFile("index.html"); // Para SPAs con Blazor o aplicaciones front-end
+app.UseAuthorization();
 
-// Ejecutar la aplicación
+app.MapControllers();
+
+app.MapFallbackToFile("index.html");
+
 app.Run();
