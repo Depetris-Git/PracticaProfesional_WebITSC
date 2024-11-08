@@ -62,6 +62,10 @@ namespace WebITSC.Server.Controllers.General
             }
             catch (Exception e)
             {
+                if (e.InnerException != null)
+                {
+                    return BadRequest($"Error: {e.Message}. Inner Exception: {e.InnerException.Message}");
+                }
                 return BadRequest(e.Message);
             }
         }

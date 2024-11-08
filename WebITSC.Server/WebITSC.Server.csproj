@@ -7,9 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\Administracion\**" />
+    <Compile Remove="Controllers\Alumnos\**" />
     <Compile Remove="Controllers\Profesores\**" />
+    <Content Remove="Controllers\Administracion\**" />
+    <Content Remove="Controllers\Alumnos\**" />
     <Content Remove="Controllers\Profesores\**" />
+    <EmbeddedResource Remove="Controllers\Administracion\**" />
+    <EmbeddedResource Remove="Controllers\Alumnos\**" />
     <EmbeddedResource Remove="Controllers\Profesores\**" />
+    <None Remove="Controllers\Administracion\**" />
+    <None Remove="Controllers\Alumnos\**" />
     <None Remove="Controllers\Profesores\**" />
   </ItemGroup>
 
@@ -21,11 +29,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\Administracion\" />
-    <Folder Include="Controllers\Alumnos\" />
   </ItemGroup>
 
   <ItemGroup>

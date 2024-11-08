@@ -1,16 +1,15 @@
-﻿using System;
+﻿using WebITSC.DB.Data.Entity;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WebITSC.Shared.General.DTO
+namespace WebITSC.Shared.General.DTO.Persona
 {
-    public class GetPersonaDTO
+    public class CrearPersonaDTO
     {
-        public int Id { get; set; }
-        
         [Required(ErrorMessage = "El nombre es necesario")]
         [MaxLength(80, ErrorMessage = "Máximo número de caracteres {1}.")]
         public string Nombre { get; set; }
@@ -23,9 +22,13 @@ namespace WebITSC.Shared.General.DTO
         [MaxLength(16, ErrorMessage = "Máximo número de caracteres {1}.")]
         public string Documento { get; set; }
 
-        [Required(ErrorMessage = "El Número de Documento es necesario")]
-        [MaxLength(16, ErrorMessage = "Máximo número de caracteres {1}.")] 
-        public int Cohorte { get; set; }
+        [Required(ErrorMessage = "El tipo de documento es necesario")]
+        public int TipoDocumentoId { get; set; }
 
+        [MaxLength(18, ErrorMessage = "Máximo número de caracteres {1}.")]
+        public string? Telefono { get; set; }
+
+        [MaxLength(60, ErrorMessage = "Máximo número de caracteres {1}.")]
+        public string? Domicilio { get; set; }
     }
 }

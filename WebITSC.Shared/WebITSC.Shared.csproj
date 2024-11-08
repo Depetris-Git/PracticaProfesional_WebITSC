@@ -7,9 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Profesores\**" />
+    <EmbeddedResource Remove="Profesores\**" />
+    <None Remove="Profesores\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Administracion\" />
     <Folder Include="Alumnos\" />
-    <Folder Include="Profesores\" />
   </ItemGroup>
 
   <ItemGroup>

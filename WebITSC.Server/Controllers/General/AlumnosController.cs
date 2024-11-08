@@ -4,6 +4,9 @@ using AutoMapper;
 using WebITSC.Admin.Server.Repositorio;
 using WebITSC.Shared.General.DTO;
 using WebITSC.Shared.General.DTO.Alumnos;
+using WebITSC.Shared.General.DTO.Persona;
+using static WebITSC.Shared.General.DTO.Alumnos.CrearAlumnoDTO;
+using WebITSC.Shared.General.DTO.UsuariosDTO;
 
 namespace WebITSC.Server.Controllers.General
 {
@@ -32,7 +35,7 @@ namespace WebITSC.Server.Controllers.General
             this.usuarioRepositorio = usuarioRepositorio;
         }
         [HttpGet]
-        public async Task<ActionResult<List<Alumno>>> GetAll()
+        public async Task<ActionResult<List<GetAlumnoDTO>>> GetAll()
         {
             var alumno = await eRepositorio.FullGetAll();
 
@@ -40,7 +43,7 @@ namespace WebITSC.Server.Controllers.General
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<Alumno>> GetById(int id)
+        public async Task<ActionResult<GetAlumnoDTO>> GetById(int id)
         {
             var alumno = await eRepositorio.FullGetById(id);
             if (alumno == null) return NotFound();
@@ -73,20 +76,73 @@ namespace WebITSC.Server.Controllers.General
 
         #endregion
 
-        [HttpPost]
-        public async Task<ActionResult<int>> Post(CrearAlumnoDTO entidadDTO)
-        {
-            try
-            {
-                Alumno entidad = mapper.Map<Alumno>(entidadDTO);
+        //[HttpPost]
+        //public async Task<ActionResult<int>> Post(CrearAlumnoDTO entidadDTO)
+        //{
+        //    try
+        //    {
+        //        Alumno entidad = mapper.Map<Alumno>(entidadDTO);
 
-                return await eRepositorio.Insert(entidad);
-            }
-            catch (Exception e)
+        //        return await eRepositorio.Insert(entidad);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return BadRequest(e.Message);
+        //    }
+        //}
+
+        [HttpPost]
+        public async Task<ActionResult<GetAlumnoDTO>> CreateAlumno([FromBody] CrearAlumnoDTO CrearAlumnoDTO)
+        {
+            if (!ModelState.IsValid)
             {
-                return BadRequest(e.Message);
+                return BadRequest(ModelState);
             }
+
+            // Paso 1: Crear la Persona
+            var persona = new Persona
+            {
+                Nombre = CrearAlumnoDTO.Nombre,
+                Apellido = CrearAlumnoDTO.Apellido,
+                Documento = CrearAlumnoDTO.Documento,
+                TipoDocumentoId = CrearAlumnoDTO.TipoDocumentoId
+            };
+
+            // Usamos el repositorio de Persona para agregarla a la base de datos
+            await personaRepositorio.Insert(persona);
+
+            // Paso 2: Crear el Usuario
+            var crearUsuarioDTO = new CrearUsuarioDTO
+            {
+                Email = CrearAlumnoDTO.Email,
+                Contrasena = CrearAlumnoDTO.Contrasena // Asegúrate de encriptar la contraseña
+            };
+
+            var usuario = new Usuario
+            {
+                Email = crearUsuarioDTO.Email,
+                Contrasena = crearUsuarioDTO.Contrasena, // Asegúrate de encriptar la contraseña antes de guardar
+                PersonaId = persona.Id // Asociamos la Persona al Usuario
+            };
+
+            // Usamos el repositorio de Usuario para agregarlo a la base de datos
+            await usuarioRepositorio.Insert(usuario);
+
+            // Paso 3: Crear el Alumno y asociarlo al Usuario
+            var alumno = mapper.Map<Alumno>(CrearAlumnoDTO);
+            alumno.UsuarioId = usuario.Id;  // Asignamos el UsuarioId después de crear el Usuario
+            await alumnoRepositorio.Insert(alumno);
+
+            // Usamos el repositorio de Alumno para agregarlo a la base de datos
+            await alumnoRepositorio.Insert(alumno);
+
+            // Mapea el Alumno a GetAlumnoDTO para la respuesta
+            var getAlumnoDTO = mapper.Map<GetAlumnoDTO>(alumno);
+
+            // Retorna el nuevo alumno creado, con un código HTTP 201 (creado)
+            return CreatedAtAction(nameof(GetById), new { id = alumno.Id }, getAlumnoDTO);
         }
+
 
         [HttpPut("{id:int}")]
         public async Task<ActionResult> Put(int id, [FromBody] Alumno entidad)

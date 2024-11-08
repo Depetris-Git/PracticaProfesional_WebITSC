@@ -6,12 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WebITSC.Shared.General.DTO
+namespace WebITSC.Shared.General.DTO.UsuariosDTO
 {
     public class CrearUsuarioDTO
     {
-        [Required(ErrorMessage = "La persona que es usuario es necesaria")]
-        public int PersonaId { get; set; }
+       
 
         [Required(ErrorMessage = "El E-mail es necesario")]
         [MaxLength(100, ErrorMessage = "Máximo número de caracteres {1}.")]
@@ -21,6 +20,6 @@ namespace WebITSC.Shared.General.DTO
         [MaxLength(30, ErrorMessage = "Máximo número de caracteres {1}.")]
         public string Contrasena { get; set; }
 
-        public bool Estado { get; set; } = true; //si está activo o no el usuario, para bloquear o dar acceso al usuario entero
+        //public bool Estado { get; set; } = true; //si está activo o no el usuario, para bloquear o dar acceso al usuario entero
     }
 }
