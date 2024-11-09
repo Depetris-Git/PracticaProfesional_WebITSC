@@ -16,6 +16,7 @@ namespace WebITSC.DB.Data.Entity
         public int UsuarioId { get; set; }
         public Usuario Usuario { get; set; }
 
+        //public Persona Persona { get; set; }
 
         [Required(ErrorMessage = "El sexo del alumno es necesario")]
         [MaxLength(20, ErrorMessage = "Máximo número de caracteres {1}.")]

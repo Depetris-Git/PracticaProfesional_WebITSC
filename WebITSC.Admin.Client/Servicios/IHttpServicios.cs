@@ -1,7 +1,9 @@
-﻿namespace WebITSC.Admin.Client.Servicios
+﻿
+namespace WebITSC.Admin.Client.Servicios
 {
     public interface IHttpServicios
     {
-        Task<HttpRespuesta<T>> Get<T>(string url);
+        Task<HttpRespuesta<O>> Get<O>(string url);
+        Task<HttpRespuesta<object>> Post<O>(string url, O entidad);
     }
 }

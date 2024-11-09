@@ -3,53 +3,69 @@ using WebITSC.Admin.Server.Repositorio;
 using WebITSC.DB.Data;
 using WebITSC.DB.Data.Entity;
 using Microsoft.AspNetCore.Mvc;
-using WebITSC.Shared.General.DTO;
+using WebITSC.Shared.General.DTO.TipoDocumento;
+using Repositorio.General;
 
 namespace WebITSC.Server.Controllers.General
 {
     [ApiController]
     [Route("api/TipoDocumento")]
-    public class TipoDocumentoController : ControllerBase
+    public class TipoDocumentosController : ControllerBase
     {
-        private readonly IRepositorio<TipoDocumento> repositorio;
         private readonly IMapper mapper;
+        private readonly ITipoDocumentoRepositorio eRepositorio;
 
-        public TipoDocumentoController(IRepositorio<TipoDocumento> repositorio,
-                                  IMapper mapper)
+        //______________________________________________________________________________
+        public TipoDocumentosController(ITipoDocumentoRepositorio eRepositorio,
+                                        IMapper mapper)
         {
-
-            this.repositorio = repositorio;
+            this.eRepositorio = eRepositorio;
             this.mapper = mapper;
         }
 
-        #region Peticiones Get
+        //_______________________________________________________________________________
 
         [HttpGet]
-        public async Task<ActionResult<List<TipoDocumento>>> Get()
+        public async Task<ActionResult<List<GetTipoDocumentoDTO>>> Get()
         {
-            return await repositorio.Select();
+            try
+            {
+                var ListTdocSelect = await eRepositorio.Select();
+                var ListTdoc = mapper.Map<List<TipoDocumento>>(ListTdocSelect);
+                return Ok(ListTdoc);
+            }
+            catch (Exception ex)
+            {
+                // Registrar el error para el diagnóstico
+                Console.WriteLine($"Error en el método GET: {ex.Message}");
+                return StatusCode(500, $"Ocurrió un error interno: {ex.Message}");
+            }
         }
+        //_________________________________________________________________
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<TipoDocumento>> Get(int id)
+        public async Task<ActionResult<GetTipoDocumentoDTO>> Get(int id)
         {
-            TipoDocumento? sel = await repositorio.SelectById(id);
-            if (sel == null)
-            {
-                return NotFound();
-            }
-            return sel;
-        }
+            var entidad = await eRepositorio.SelectById(id);
 
+            if (entidad == null)
+            {
+                return NotFound("El tdocumento no existe.");
+            }
+
+            // Mapea la entidad a DTO
+            var TdocumentoDTO = mapper.Map<TipoDocumento>(entidad);
+            return Ok(TdocumentoDTO);
+        }
+        //________________________________________________________________
         [HttpGet("existe/{id:int}")]
         public async Task<ActionResult<bool>> Existe(int id)
         {
-            var existe = await repositorio.Existe(id);
+            var existe = await eRepositorio.Existe(id);
             return existe;
-
         }
+        //________________________________________________________________
 
-        #endregion
 
         [HttpPost]
         public async Task<ActionResult<int>> Post(CrearTipoDocumentoDTO entidadDTO)
@@ -57,58 +73,70 @@ namespace WebITSC.Server.Controllers.General
             try
             {
                 TipoDocumento entidad = mapper.Map<TipoDocumento>(entidadDTO);
-
-                return await repositorio.Insert(entidad);
+                return await eRepositorio.Insert(entidad);
             }
             catch (Exception e)
             {
+                if (e.InnerException != null)
+                {
+                    return BadRequest($"Error: {e.Message}. Inner Exception: {e.InnerException.Message}");
+                }
                 return BadRequest(e.Message);
             }
         }
+        //______________________________________________________________________________________
 
-        [HttpPut("{id:int}")]
-        public async Task<ActionResult> Put(int id, [FromBody] TipoDocumento entidad)
-        {
-            if (id != entidad.Id)
-            {
-                return BadRequest("Datos incorrectos");
-            }
-            var sel = await repositorio.SelectById(id);
-            //sel = Seleccion
+        //[HttpPut("{id:int}")]
+        //public async Task<ActionResult> Put(int id, [FromBody] PutTdocumentoDTO dto)
+        //{
+        //    // Validar el modelo
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState); // Devuelve errores de validación
+        //    }
 
-            if (sel == null)
-            {
-                return NotFound("No existe el tipo de documento buscado.");
-            }
+        //    var sel = await repositorio.SelectById(id);
+        //    if (sel == null)
+        //    {
+        //        return NotFound("El tdocumento no existe.");
+        //    }
 
+        //    // Mapea solo los campos que cambiaron
+        //    mapper.Map(dto, sel);
 
-            sel = mapper.Map<TipoDocumento>(entidad);
-
-            try
-            {
-                await repositorio.Update(id, sel);
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-        }
+        //    try
+        //    {
+        //        var actualizado = await repositorio.Update(id, sel);
+        //        if (actualizado)
+        //        {
+        //            return Ok();
+        //        }
+        //        else
+        //        {
+        //            return BadRequest("No se pudo actualizar el tdocumento.");
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return BadRequest(e.Message);
+        //    }
+        //}
+        //_________________________________________________________________________________________
 
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var existe = await repositorio.Existe(id);
+            var existe = await eRepositorio.Existe(id);
             if (!existe)
             {
-                return NotFound($"El TipoDocumento {id} no existe");
+                return NotFound($"La persona {id} no existe");
             }
             TipoDocumento EntidadABorrar = new TipoDocumento();
             EntidadABorrar.Id = id;
 
-            if (await repositorio.Delete(id))
+            if (await eRepositorio.Delete(id))
             {
-                return Ok();
+                return Ok($"El tipo de documento {id} fue eliminado");
             }
             else
             {
@@ -116,8 +144,6 @@ namespace WebITSC.Server.Controllers.General
             }
 
         }
-
-
 
     }
 

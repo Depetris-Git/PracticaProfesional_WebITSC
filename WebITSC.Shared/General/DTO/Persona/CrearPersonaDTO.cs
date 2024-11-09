@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WebITSC.Shared.General.DTO
+namespace WebITSC.Shared.General.DTO.Persona
 {
     public class CrearPersonaDTO
     {

@@ -4,7 +4,7 @@ using WebITSC.Admin.Server.Repositorio;
 using WebITSC.DB.Data;
 using WebITSC.DB.Data.Entity;
 using Microsoft.AspNetCore.Mvc;
-using WebITSC.Shared.General.DTO;
+using WebITSC.Shared.General.DTO.InscripcionCarrera;
 
 namespace WebITSC.Server.Controllers.General
 {
@@ -22,16 +22,27 @@ namespace WebITSC.Server.Controllers.General
             this.eRepositorio = eRepositorio;
             this.mapper = mapper;
         }
+       
         [HttpGet]
-        public async Task<ActionResult<List<InscripcionCarrera>>> GetAll()
+        public async Task<ActionResult<List<GetIncripcionCarreraDTO>>> GetAlumnosInscritosEnCarreraYcohorte(int carreraId, int? cohorte)
         {
-            var inscrpicionCarreras = await eRepositorio.FullGetAll();
+            // Obtener las inscripciones filtradas por CarreraId y, si es necesario, por Cohorte
+            var inscripciones = await eRepositorio.ObtenerInscripcionesPorCarreraYcohorte(carreraId, cohorte);
 
-            return Ok(inscrpicionCarreras);
+            if (inscripciones == null || !inscripciones.Any())
+            {
+                return NotFound();  // Si no hay inscripciones
+            }
+
+            // Usamos AutoMapper para mapear las inscripciones a un DTO
+            var inscripcionesDto = mapper.Map<List<GetIncripcionCarreraDTO>>(inscripciones);
+
+            return Ok(inscripcionesDto); // Devolvemos la lista de DTOs
         }
 
+
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<InscripcionCarrera>> GetById(int id)
+        public async Task<ActionResult<GetIncripcionCarreraDTO>> GetById(int id)
         {
             var inscrpicionCarrera = await eRepositorio.FullGetById(id);
             if (inscrpicionCarrera == null) return NotFound();

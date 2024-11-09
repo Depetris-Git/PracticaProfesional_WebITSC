@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
-using WebITSC.Admin.Server.Repositorio;
 
-using WebITSC.DB.Data;
 using WebITSC.DB.Data.Entity;
 using Microsoft.AspNetCore.Mvc;
-using WebITSC.Shared.General.DTO;
+using WebITSC.Shared.General.DTO.UsuariosDTO;
+using WebITSC.Admin.Server.Repositorio;
 
 namespace WebITSC.Server.Controllers.General
 {
@@ -24,11 +23,15 @@ namespace WebITSC.Server.Controllers.General
             this.mapper = mapper;
         }
         [HttpGet]
-        public async Task<ActionResult<List<Usuario>>> GetAll()
-        {
+        public async Task<ActionResult<List<GetUsuarioDTO>>> GetAll()
+        {// Obtener todos los usuarios
             var usuarios = await eRepositorio.FullGetAll();
 
-            return Ok(usuarios);
+            // Usar AutoMapper para mapear la lista de 'Usuario' a 'GetUsuarioDTO'
+            var usuariosDTO = mapper.Map<List<GetUsuarioDTO>>(usuarios);
+
+            // Devolver la respuesta mapeada
+            return Ok(usuariosDTO);
         }
 
         [HttpGet("{id:int}")]
@@ -39,34 +42,6 @@ namespace WebITSC.Server.Controllers.General
 
             return Ok(usuario);
         }
-        #region Peticiones Get
-
-        //[HttpGet]
-        //public async Task<ActionResult<List<Usuario>>> Get()
-        //{
-        //    return await repositorio.Select();
-        //}
-
-        //[HttpGet("{id:int}")]
-        //public async Task<ActionResult<Usuario>> Get(int id)
-        //{
-        //    Usuario? sel = await repositorio.SelectById(id);
-        //    if (sel == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return sel;
-        //}
-
-        //[HttpGet("existe/{id:int}")]
-        //public async Task<ActionResult<bool>> Existe(int id)
-        //{
-        //    var existe = await repositorio.Existe(id);
-        //    return existe;
-
-        //}
-
-        #endregion
 
         [HttpPost]
         public async Task<ActionResult<int>> Post(CrearUsuarioDTO entidadDTO)

@@ -1,6 +1,5 @@
 ﻿@page "/Alumnos"
 @inject IHttpServicios http
-@inject HttpClient Http
 
 <PageTitle>Alumnos</PageTitle>
 
@@ -12,63 +11,93 @@
     <input @bind="nombre" placeholder="Nombre" />
     <input @bind="apellido" placeholder="Apellido" />
     <input @bind="documento" placeholder="Documento" />
-    <input @bind="cohorte" type="number" placeholder="Cohorte" />
-    <button @onclick="Buscar">Buscar</button>
+    <input @bind="cohorte" placeholder="Cohorte" />
+    <button @onclick="BuscarAlumnos">Buscar</button>
 </div>
 
-@if (alumnos != null && alumnos.Count > 0)
-{
-    <table>
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Documento</th>
-                <th>Cohorte</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var alumno in alumnos)
-            {
-                <tr>
-                    <td>@alumno.Usuario.Persona.Nombre</td>
-                    <td>@alumno.Usuario.Persona.Apellido</td>
-                    <td>@alumno.Usuario.Persona.Documento</td>
-                    <td>@alumno.InscripcionesCarreras.FirstOrDefault()?.Cohorte</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else if (isSearchTriggered)
-{
-    <p>No se encontraron alumnos.</p>
-}
 
-@code {
-    private string? nombre;
-    private string? apellido;
-    private string? documento;
-    private int? cohorte;
-    private List<Alumno>? alumnos;
-    private bool isSearchTriggered = false;
-
-    private async Task Buscar()
+<table>
+    @if (Mensaje == "")
     {
-        var response = await Http.GetAsync($"api/alumnos/buscar?nombre={nombre}&apellido={apellido}&documento={documento}&cohorte={cohorte}");
-
-        if (response.IsSuccessStatusCode)
+        @if (alumnos == null)
         {
-            alumnos = await response.Content.ReadFromJsonAsync<List<Alumno>>();
+            <p>Buscando....</p>
+        }
+        else if (alumnos.Count == 0)
+        {
+            <p>No existen tipos de documentos</p>
         }
         else
         {
-            alumnos = null; // O manejar el error de forma diferente
+            @foreach (var alumno in alumnos)
+            {
+                <tr>
+                    <td>@alumno.Usuario.Persona?.Nombre</td>
+                    <td>@alumno.Usuario.Persona?.Apellido</td>
+                    <td>@alumno.Usuario.Persona?.Documento</td>
+                    <td>@alumno.InscripcionesCarreras.FirstOrDefault()?.Cohorte</td>
+                </tr>
+            }
+        }
+    }
+    else
+    {
+        <p> Error: @Mensaje</p>
+    }
+</table>
+
+
+
+@code {
+    string nombre;
+    string apellido;
+    string documento;
+    int? cohorte  ;
+    string Mensaje = string.Empty ;
+    List<Alumno>? alumnos = new List<Alumno>();
+    Alumno alumno = new Alumno();
+    
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await BuscarAlumnos();
+    }
+
+
+    private async Task BuscarAlumnos()
+    {
+        // Construir la URL de consulta con los parámetros
+        var queryParams = new Dictionary<string, string>();
+        if (!string.IsNullOrEmpty(nombre)) queryParams.Add("nombre", nombre);
+        if (!string.IsNullOrEmpty(apellido)) queryParams.Add("apellido", apellido);
+        if (!string.IsNullOrEmpty(documento)) queryParams.Add("documento", documento);
+        if (cohorte.HasValue) queryParams.Add("cohorte", cohorte.Value.ToString());
+
+        // Verificar si todos los campos están vacíos
+        if (!queryParams.Any())
+        {
+            Mensaje = "Debe completar al menos un campo de búsqueda.";
+            return;
         }
 
-        isSearchTriggered = true;
+        var queryString = string.Join("&", queryParams.Select(x => $"{x.Key}={x.Value}"));
+        var url = $"/api/Alumnos/buscar?{queryString}";
+
+        var resp = await http.Get<List<Alumno>>(url);
+        if (!resp.Error)
+        {
+            alumnos = resp.Respuesta;
+        }
+        else
+        {
+            Mensaje = await resp.ObtenerError();
+        }
     }
 }
+
+
+
 
 
 

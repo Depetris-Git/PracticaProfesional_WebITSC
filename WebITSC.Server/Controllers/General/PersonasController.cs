@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using WebITSC.Admin.Server.Repositorio;
-
 using WebITSC.DB.Data;
 using WebITSC.DB.Data.Entity;
 using Microsoft.AspNetCore.Mvc;
-using WebITSC.Shared.General.DTO;
+using WebITSC.Shared.General.DTO.Persona;
+using WebITSC.Shared.General.DTO.Alumnos;
 
 namespace WebITSC.Server.Controllers.General
 {
@@ -25,15 +25,20 @@ namespace WebITSC.Server.Controllers.General
             this.mapper = mapper;
         }
         [HttpGet]
-        public async Task<ActionResult<List<Persona>>> GetAll()
+        public async Task<ActionResult<List<GetPersonaDTO>>> GetAll()
         {
+            // Obtener todos los alumnos
             var personas = await eRepositorio.FullGetAll();
 
-            return Ok(personas);
+            // Usar AutoMapper para mapear la lista de 'Usuario' a 'GetUsuarioDTO'
+            var personasDTO = mapper.Map<List<GetPersonaDTO>>(personas);
+
+            // Devolver la respuesta mapeada
+            return Ok(personasDTO); ;
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<Persona>> GetById(int id)
+        public async Task<ActionResult<GetPersonaDTO>> GetById(int id)
         {
             var persona = await eRepositorio.FullGetById(id);
             if (persona == null) return NotFound();
@@ -61,24 +66,8 @@ namespace WebITSC.Server.Controllers.General
         }
 
         //----------------------------------------------------------------------------------------------------------------
-        #region Peticiones Get
+     
 
-        //[HttpGet]
-        //public async Task<ActionResult<List<Persona>>> Get()
-        //{
-        //    return await repositorio.Select();
-        //}
-
-        //[HttpGet("{id:int}")]
-        //public async Task<ActionResult<Persona>> Get(int id)
-        //{
-        //    Persona? sel = await repositorio.SelectById(id);
-        //    if (sel == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return sel;
-        //}
 
         [HttpGet("existe/{id:int}")]
         public async Task<ActionResult<bool>> Existe(int id)
@@ -88,52 +77,7 @@ namespace WebITSC.Server.Controllers.General
 
         }
 
-        #endregion
-
-        //[HttpPost]
-        //public async Task<ActionResult<int>> Post(CrearPersonaDTO entidadDTO)
-        //{
-        //    try
-        //    {
-        //        Persona entidad = mapper.Map<Persona>(entidadDTO);
-
-        //        return await repositorio.Insert(entidad);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return BadRequest(e.Message);
-        //    }
-        //}
-
-        //[HttpPut("{id:int}")]
-        //public async Task<ActionResult> Put(int id, [FromBody] Persona entidad)
-        //{
-        //    if (id != entidad.Id)
-        //    {
-        //        return BadRequest("Datos incorrectos");
-        //    }
-        //    var sel = await repositorio.SelectById(id);
-        //    //sel = Seleccion
-
-        //    if (sel == null)
-        //    {
-        //        return NotFound("No existe el tipo de documento buscado.");
-        //    }
-
-
-        //    sel = mapper.Map<Persona>(entidad); 
-
-        //    try
-        //    {
-        //        await repositorio.Update(id, sel);
-        //        return Ok();
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return BadRequest(e.Message);
-        //    }
-        //}
-
+     
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+
 
 namespace WebITSC.Shared.General.DTO
 {
@@ -12,7 +12,7 @@ namespace WebITSC.Shared.General.DTO
     {
         [Required(ErrorMessage = "El usuario que será coordinador es necesario")]
         public int UsuarioId { get; set; }
-        public Usuario Usuario { get; set; }
+        public Usuario usuario { get; set; }
 
         [Required(ErrorMessage = "La carrera es necesaria")]
         public int CarreraId { get; set; }

@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebITSC.DB.Data;
 using WebITSC.DB.Data.Entity;
-using Microsoft.EntityFrameworkCore;
-
 using AutoMapper;
 using WebITSC.Admin.Server.Repositorio;
-using WebITSC.Shared.General.DTO;
+using WebITSC.Shared.General.DTO.Alumnos;
+using WebITSC.Shared.General.DTO.Persona;
+using WebITSC.Shared.General.DTO.UsuariosDTO;
+using Repositorio.General;
+
 
 namespace WebITSC.Server.Controllers.General
 {
@@ -13,40 +14,52 @@ namespace WebITSC.Server.Controllers.General
     [Route("api/Alumnos")]
     public class AlumnosController : ControllerBase
     {
-
         private readonly IAlumnoRepositorio eRepositorio;
         private readonly IMapper mapper;
-        private readonly IAlumnoRepositorio alumnoRepositorio;
         private readonly IPersonaRepositorio personaRepositorio;
         private readonly IUsuarioRepositorio usuarioRepositorio;
+        private readonly IInscripcionCarreraRepositorio inscripcionCarreraRepositorio;
+        private readonly ICarreraRepositorio carreraRepositorio;
+        private readonly ITipoDocumentoRepositorio tipoDocumentoRepositorio;
 
+        // Constructor
         public AlumnosController(IAlumnoRepositorio eRepositorio,
                                   IMapper mapper,
-                                  IAlumnoRepositorio alumnoRepositorio,
                                   IPersonaRepositorio personaRepositorio,
-                                  IUsuarioRepositorio usuarioRepositorio)
+                                  IUsuarioRepositorio usuarioRepositorio,
+                                  IInscripcionCarreraRepositorio inscripcionCarreraRepositorio,
+                                  ICarreraRepositorio carreraRepositorio,
+                                  ITipoDocumentoRepositorio tipoDocumentoRepositorio)
         {
-
             this.eRepositorio = eRepositorio;
             this.mapper = mapper;
-            this.alumnoRepositorio = alumnoRepositorio;
             this.personaRepositorio = personaRepositorio;
             this.usuarioRepositorio = usuarioRepositorio;
+            this.inscripcionCarreraRepositorio = inscripcionCarreraRepositorio;
+            this.carreraRepositorio = carreraRepositorio;
+            this.tipoDocumentoRepositorio = tipoDocumentoRepositorio;   
+
         }
+
+        // Obtener todos los alumnos
         [HttpGet]
-        public async Task<ActionResult<List<Alumno>>> GetAll()
+        public async Task<ActionResult<List<GetAlumnoDTO>>> GetAll()
         {
-            var alumno = await eRepositorio.FullGetAll();
+            // Obtener todos los alumnos
+            var alumnos = await eRepositorio.FullGetAll();
 
-            return Ok(alumno);
+            // Usar AutoMapper para mapear la lista de 'Usuario' a 'GetUsuarioDTO'
+            var alumnosDTO = mapper.Map<List<GetAlumnoDTO>>(alumnos);
+
+            // Devolver la respuesta mapeada
+            return Ok(alumnosDTO);
         }
-
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<Alumno>> GetById(int id)
+            // Obtener alumno por ID
+            [HttpGet("{id:int}")]
+        public async Task<ActionResult<GetAlumnoDTO>> GetById(int id)
         {
             var alumno = await eRepositorio.FullGetById(id);
             if (alumno == null) return NotFound();
-
             return Ok(alumno);
         }
         #region Peticiones Get
@@ -86,9 +99,9 @@ namespace WebITSC.Server.Controllers.General
             [FromQuery] string? documento,
             [FromQuery] int? cohorte)
         {
-            var alumnos = await alumnoRepositorio.BuscarAlumnos(nombre, apellido, documento, cohorte);
+            var alumnos = await eRepositorio.BuscarAlumnos(nombre, apellido, documento, cohorte);
 
-            if (alumnos == null || !alumnos.Value.Any())
+            if (alumnos == null || !alumnos.Any())
             {
                 return NotFound("No se encontraron alumnos.");
             }
@@ -96,27 +109,95 @@ namespace WebITSC.Server.Controllers.General
             return Ok(alumnos.Value);
         }
 
-
-
-
-
         #endregion
 
+        // Crear nuevo alumno
         [HttpPost]
-        public async Task<ActionResult<int>> Post(CrearAlumnoDTO entidadDTO)
+        public async Task<ActionResult<int>> Post([FromBody] CrearAlumnoDTO crearAlumnoDTO)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                Alumno entidad = mapper.Map<Alumno>(entidadDTO);
+                return BadRequest(ModelState);
+            }
 
-                return await eRepositorio.Insert(entidad);
-            }
-            catch (Exception e)
+            // Paso 1: Validar que la carrera exista
+            var carrera = await carreraRepositorio.GetCarreraByIdAsync(crearAlumnoDTO.CarreraId);
+            if (carrera == null)
             {
-                return BadRequest(e.Message);
+                return BadRequest("La carrera especificada no existe.");
             }
+            ////  Validar que el TipoDocumentoId sea válido
+            var tipoDocumento = await tipoDocumentoRepositorio.GetByIdAsync(crearAlumnoDTO.TipoDocumentoId);
+            if (tipoDocumento == null)
+            {
+                return BadRequest("El tipo de documento especificado no existe.");
+            }
+            // Paso 2: Crear la Persona
+            var persona = new Persona
+            {
+                Nombre = crearAlumnoDTO.Nombre,
+                Apellido = crearAlumnoDTO.Apellido,
+                Documento = crearAlumnoDTO.Documento,
+                TipoDocumentoId = crearAlumnoDTO.TipoDocumentoId
+            };
+
+            // Usamos el repositorio de Persona para agregarla a la base de datos
+            await personaRepositorio.Insert(persona);
+
+            // Paso 3: Crear el Usuario
+            var crearUsuarioDTO = new CrearUsuarioDTO
+            {
+                Email = crearAlumnoDTO.Email,
+                Contrasena = crearAlumnoDTO.Contrasena // Asegúrate de encriptar la contraseña
+            };
+
+            var usuario = new Usuario
+            {
+                Email = crearUsuarioDTO.Email,
+                Contrasena = crearUsuarioDTO.Contrasena, // Asegúrate de encriptar la contraseña antes de guardar
+                PersonaId = persona.Id, // Asociamos la Persona al Usuario
+                //Estado = crearUsuarioDTO.Estado = true
+            };
+
+            // Usamos el repositorio de Usuario para agregarlo a la base de datos
+            await usuarioRepositorio.Insert(usuario);
+
+            // Paso 4: Crear el Alumno
+            var alumno = mapper.Map<Alumno>(crearAlumnoDTO);
+            alumno.UsuarioId = usuario.Id;  // Asignamos el UsuarioId después de crear el Usuario
+            await eRepositorio.Insert(alumno); // Usamos el repositorio de Alumno para agregarlo a la base de datos
+
+            // Paso 5: Validar si el alumno ya está inscrito en esta carrera
+            var inscripcionExistente = await inscripcionCarreraRepositorio
+                .GetInscripcionByAlumnoYCarrera(alumno.Id, crearAlumnoDTO.CarreraId);
+
+            if (inscripcionExistente != null)
+            {
+                return BadRequest("El alumno ya está inscrito en esta carrera.");
+            }
+
+            // Paso 6: Inscribir al alumno en la carrera
+            var inscripcionCarrera = new InscripcionCarrera
+            {
+                AlumnoId = alumno.Id,
+                CarreraId = crearAlumnoDTO.CarreraId,
+                Cohorte = DateTime.Now.Year , // O la fecha que sea adecuada
+                EstadoAlumno = "Activo",
+                Legajo = "legajo",
+                LibroMatriz = "Libro Matriz",
+                NroOrdenAlumno ="NumOrdenAlumno"
+            };
+
+            await inscripcionCarreraRepositorio.Insert(inscripcionCarrera); // Inscribir al alumno en la carrera
+
+            // Mapea el Alumno a GetAlumnoDTO para la respuesta
+            var getAlumnoDTO = mapper.Map<GetAlumnoDTO>(alumno);
+
+            // Retorna el nuevo alumno creado, con un código HTTP 201 (creado)
+            return CreatedAtAction(nameof(GetById), new { id = alumno.Id }, getAlumnoDTO);
         }
 
+        // Actualizar alumno
         [HttpPut("{id:int}")]
         public async Task<ActionResult> Put(int id, [FromBody] Alumno entidad)
         {
@@ -124,21 +205,26 @@ namespace WebITSC.Server.Controllers.General
             {
                 return BadRequest("Datos incorrectos");
             }
-            var sel = await eRepositorio.SelectById(id);
-            //sel = Seleccion
 
+            // Verifica si la entidad existe antes de continuar
+            var sel = await eRepositorio.SelectById(id);
             if (sel == null)
             {
-                return NotFound("No existe el tipo de documento buscado.");
+                return NotFound($"El alumno con ID {id} no existe.");
             }
 
-
-            sel = mapper.Map<Alumno>(entidad);
+            // Actualiza la entidad
+            mapper.Map(entidad, sel); // Mapea los nuevos valores a la entidad existente
 
             try
             {
-                await eRepositorio.Update(id, sel);
-                return Ok();
+                // Usa `eRepositorio.Update` para actualizar
+                var updated = await eRepositorio.Update(id, sel);
+                if (updated)
+                {
+                    return Ok();
+                }
+                return BadRequest("No se pudo actualizar el alumno.");
             }
             catch (Exception e)
             {
@@ -146,31 +232,33 @@ namespace WebITSC.Server.Controllers.General
             }
         }
 
+        // Eliminar alumno
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var existe = await eRepositorio.Existe(id);
-            if (!existe)
+            // Verifica si el alumno existe
+            var alumnoExistente = await eRepositorio.FullGetById(id);
+            if (alumnoExistente == null)
             {
-                return NotFound($"La persona {id} no existe");
+                return NotFound($"El alumno con ID {id} no existe.");
             }
-            Alumno EntidadABorrar = new Alumno();
-            EntidadABorrar.Id = id;
 
-            if (await eRepositorio.Delete(id))
+            // Llamamos al repositorio para eliminar el alumno
+            var resultado = await eRepositorio.EliminarAlumno(id);
+
+            if (resultado)
             {
-                return Ok();
+                return Ok($"El alumno con ID {id} fue eliminado correctamente.");
             }
             else
             {
-                return BadRequest();
+                return BadRequest("No se pudo eliminar el alumno. Ocurrió un error.");
             }
-
         }
 
 
-
     }
-
 }
+
+
 

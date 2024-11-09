@@ -34,5 +34,8 @@ namespace WebITSC.DB.Data.Entity
 
         [MaxLength(60, ErrorMessage = "Máximo número de caracteres {1}.")]
         public string? Domicilio { get; set; }
+
+        //para el mapper
+        public InscripcionCarrera inscripcion_Carrera;
     }
 }

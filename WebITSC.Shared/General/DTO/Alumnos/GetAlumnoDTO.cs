@@ -1,22 +1,23 @@
-﻿using WebITSC.DB.Data.Entity;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WebITSC.Shared.General.DTO
+namespace WebITSC.Shared.General.DTO.Alumnos
 {
-    public class CrearAlumnoDTO
+    public class GetAlumnoDTO
     {
-        [Required(ErrorMessage = "El usuario que es alumno es necesario")]
-        public int UsuarioId { get; set; }
+        public int Id { get; set; }
+        public int CarreraId { get; set; }  // Carrera en la que se va a inscribir
 
-        [Required(ErrorMessage = "El sexo del alumno es necesario")]
-        [MaxLength(20, ErrorMessage = "Máximo número de caracteres {1}.")]
+        public string NombrePersona { get; set; }
+        public string ApellidoPersona { get; set; }
+        public string DocumentoPersona { get; set; }
+        public string? TelefonoPersona { get; set; }
+        public string DomicilioPersona { get; set; }
         public string Sexo { get; set; }
-
 
         [Required(ErrorMessage = "La fecha de nacimiento del alumno es necesario")]
         public DateTime FechaNacimiento { get; set; }
@@ -26,7 +27,6 @@ namespace WebITSC.Shared.General.DTO
 
         [MaxLength(16, ErrorMessage = "Máximo número de caracteres {1}.")]
         public string? CUIL { get; set; }
-
 
         [Required(ErrorMessage = "El país de nacimiento del alumno es necesario")]
         [MaxLength(30, ErrorMessage = "Máximo número de caracteres {1}.")]
@@ -45,7 +45,7 @@ namespace WebITSC.Shared.General.DTO
         public string? FotocopiaDNI { get; set; }
 
         [MaxLength(16, ErrorMessage = "Máximo número de caracteres {1}.")]
-        public string? ConstanciaCUIL { get; set; }
+        public string? ConstanciaCUIL { get; set; } //esto es para indicar que el alumno trajo o mandó un documento virtual de la constancia de CUIL, no tiene que ver con el atributo "CUIL", el cual es el cuil real.
 
         [MaxLength(40, ErrorMessage = "Máximo número de caracteres {1}.")]
         public string? PartidaNacimiento { get; set; }
@@ -58,11 +58,14 @@ namespace WebITSC.Shared.General.DTO
 
         [MaxLength(40, ErrorMessage = "Máximo número de caracteres {1}.")]
         public string? CUS { get; set; }
+        
+        public bool Estado { get; set; } = true;
 
-        public bool Estado { get; set; } = true; //si está activo o no el alumno, para bloquear o dar acceso
-                                                 //al usuario en su calidad de alumno
-        public List<CertificadoAlumno> CertificadosAlumno { get; set; } = new List<CertificadoAlumno>();
-        public List<CursadoMateria> MateriasCursadas { get; set; } = new List<CursadoMateria>();
-        public List<InscripcionCarrera> InscripcionesCarreras { get; set; } = new List<InscripcionCarrera>();
+        //_persona_____________________________________________________________________ 
+        //public string PersonaId { get; set; }
+
+        //_cohorte_____________________________________________________________________
+       public int Cohorte { get; set; }
+
     }
 }

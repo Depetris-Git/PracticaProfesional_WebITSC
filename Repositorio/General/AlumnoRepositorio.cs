@@ -16,44 +16,58 @@ namespace WebITSC.Admin.Server.Repositorio
             this.context = context;
         }
 
+        public async Task<List<Alumno>> FullGetAll()
+        {
+            return await context.Alumnos
+                .Include(a => a.Usuario)              // Asegúrate de incluir el Usuario
+                .ThenInclude(u => u.Persona)          // Y también incluir Persona dentro de Usuario
+                .ToListAsync();
+        }
+
         public async Task<Alumno> FullGetById(int id)
         {
             return await context.Alumnos
                 .Include(a => a.Usuario)
+                .ThenInclude(u => u.Persona)         // Asegúrate de incluir Persona
                 .FirstOrDefaultAsync(a => a.Id == id);
         }
-        //________________________________________________
-        public async Task<List<Alumno>> FullGetAll()
-        {
-            return await context.Alumnos
-                .Include(a => a.Usuario)
-                .ToListAsync();
-        }
+
         //________________________________________________
         public async Task<ActionResult<IEnumerable<BuscarAlumnoDTO>>> BuscarAlumnos(string? nombre, string? apellido, string? documento, int? cohorte)
         {
             var query = context.Alumnos.Include(a => a.Usuario).AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(nombre))
+            if (!string.IsNullOrWhiteSpace(nombre) ||
+                !string.IsNullOrWhiteSpace(apellido) ||
+                !string.IsNullOrWhiteSpace(documento) ||
+                cohorte.HasValue)
             {
-                query = query.Where(a => a.Usuario.Persona.Nombre.Contains(nombre));
+                if (!string.IsNullOrWhiteSpace(nombre))
+                {
+                    query = query.Where(a => a.Usuario.Persona.Nombre.Contains(nombre));
+                }
+
+                if (!string.IsNullOrWhiteSpace(apellido))
+                {
+                    query = query.Where(a => a.Usuario.Persona.Apellido.Contains(apellido));
+                }
+
+                if (!string.IsNullOrWhiteSpace(documento))
+                {
+                    query = query.Where(a => a.Usuario.Persona.Documento.Contains(documento));
+                }
+
+                if (cohorte.HasValue)
+                {
+                    query = query.Where(a => a.InscripcionesCarreras.Any(ic => ic.Cohorte == cohorte));
+                }
+            }
+            {
+                var resultados = await query.ToListAsync();
+                return resultados;
             }
 
-            if (!string.IsNullOrWhiteSpace(apellido))
-            {
-                query = query.Where(a => a.Usuario.Persona.Apellido.Contains(apellido));
-            }
-
-            if (!string.IsNullOrWhiteSpace(documento))
-            {
-                query = query.Where(a => a.Usuario.Persona.Documento.Contains(documento));
-            }
-
-
-            if (cohorte.HasValue)
-            {
-                query = query.Where(a => a.InscripcionesCarreras.Any(ic => ic.Cohorte == cohorte));
-            }
+        }
 
             var resultados = await query.Select(a => new BuscarAlumnoDTO
             {
@@ -107,18 +121,69 @@ namespace WebITSC.Admin.Server.Repositorio
                 }).ToList()
 
             }).ToListAsync();
-
-            return resultados;
-        }
-
-        Task<ActionResult<int>> IAlumnoRepositorio.Insert(Alumno entidad)
+        public async Task<bool> EliminarAlumno(int alumnoId)
         {
-            throw new NotImplementedException();
-        }
+            using (var transaction = await context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    // 1. Eliminar las inscripciones en carreras relacionadas con el alumno
+                    var inscripciones = await context.InscripcionesCarrera
+                        .Where(i => i.AlumnoId == alumnoId)
+                        .ToListAsync();
 
-        Task IAlumnoRepositorio.Update(int id, Alumno sel)
-        {
-            throw new NotImplementedException();
-        }
+                    if (inscripciones.Any())
+                    {
+                        context.InscripcionesCarrera.RemoveRange(inscripciones);  // Eliminar todas las inscripciones
+                        await context.SaveChangesAsync();  // Guardar cambios
+                    }
+
+                    // 2. Eliminar el alumno
+                    var alumno = await context.Alumnos
+                        .Where(a => a.Id == alumnoId)
+                        .FirstOrDefaultAsync();
+
+                    if (alumno != null)
+                    {
+                        context.Alumnos.Remove(alumno);  // Eliminar el alumno
+                        await context.SaveChangesAsync();  // Guardar cambios
+                    }
+
+                    // 3. Eliminar el usuario asociado al alumno
+                    var usuario = await context.Usuarios
+                        .Where(u => u.Id == alumno.UsuarioId)
+                        .FirstOrDefaultAsync();
+
+                    if (usuario != null)
+                    {
+                        context.Usuarios.Remove(usuario);  // Eliminar el usuario
+                        await context.SaveChangesAsync();  // Guardar cambios
+                    }
+
+                    // 4. Eliminar la persona asociada al usuario
+                    var persona = await context.Personas
+                        .Where(p => p.Id == usuario.PersonaId)
+                        .FirstOrDefaultAsync();
+
+                    if (persona != null)
+                    {
+                        context.Personas.Remove(persona);  // Eliminar la persona
+                        await context.SaveChangesAsync();  // Guardar cambios
+                    }
+
+                    // Confirmar la transacción
+                    await transaction.CommitAsync();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();  // Revertir los cambios en caso de error
+                                                        // Loguear el error si es necesario
+                    return false;
+                }
+
+            }
+
+        } 
     }
 }

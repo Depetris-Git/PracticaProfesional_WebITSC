@@ -12,6 +12,8 @@ namespace WebITSC.DB.Data.Entity
     [Index(nameof(CarreraId), nameof(Cohorte), Name = "CohorteIDX", IsUnique = false)]
     public class InscripcionCarrera : EntityBase
     {
+        public InscripcionCarrera inscripcion_Carrera;
+
         [Required(ErrorMessage = "El alumno es necesario")]
         public int AlumnoId { get; set; }
         public Alumno Alumno { get; set; }
