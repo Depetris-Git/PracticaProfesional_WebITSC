@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WebITSC.DB\WebITSC.DB.csproj" />
+    <ProjectReference Include="..\WebITSC.Shared\WebITSC.Shared.csproj" />
   </ItemGroup>
 
 </Project>

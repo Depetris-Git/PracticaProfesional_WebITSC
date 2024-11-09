@@ -1,11 +1,12 @@
 ﻿using WebITSC.DB.Data.Entity;
 using Microsoft.AspNetCore.Mvc;
+using WebITSC.Shared.General.DTO;
 
 namespace WebITSC.Admin.Server.Repositorio
 {
     public interface IAlumnoRepositorio
     {
-        Task<ActionResult<IEnumerable<Alumno>>> BuscarAlumnos(string? nombre, string? apellido, string? documento, int? cohorte);
+        Task<ActionResult<IEnumerable<BuscarAlumnoDTO>>> BuscarAlumnos(string? nombre, string? apellido, string? documento, int? cohorte);
         Task<bool> Delete(int id);
         Task<bool> Existe(int id);
         Task<List<Alumno>> FullGetAll();

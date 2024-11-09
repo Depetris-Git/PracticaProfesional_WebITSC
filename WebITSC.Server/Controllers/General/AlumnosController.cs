@@ -80,7 +80,7 @@ namespace WebITSC.Server.Controllers.General
 
         //GET: api/alumnos/buscar
         [HttpGet("buscar")]
-        public async Task<ActionResult<IEnumerable<Alumno>>> BuscarAlumnos(
+        public async Task<ActionResult<IEnumerable<BuscarAlumnoDTO>>> BuscarAlumnos(
             [FromQuery] string? nombre,
             [FromQuery] string? apellido,
             [FromQuery] string? documento,

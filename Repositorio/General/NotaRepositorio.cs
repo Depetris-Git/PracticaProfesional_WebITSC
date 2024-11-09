@@ -4,6 +4,7 @@ using WebITSC.DB.Data.Entity;
 //using WebITSC.Client.Pages.Alumnos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebITSC.Shared.General.DTO;
 
 namespace WebITSC.Admin.Server.Repositorio
 
@@ -33,14 +34,14 @@ namespace WebITSC.Admin.Server.Repositorio
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<object>> SelectNotasByTurno(int turnoId)
+        public async Task<List<GetNotaDTO>> SelectNotasByTurno(int turnoId)
         {
             // Verificamos que exista el turno
             var turno = await context.Turnos
                 .Include(t => t.MateriaEnPlanEstudio) // Incluimos la relación de materias
-                .FirstOrDefaultAsync(t => t.Id == turnoId);
+                .AnyAsync(t => t.Id == turnoId); 
 
-            if (turno == null)
+            if (turno != true) 
             {
                 return null;
             }
@@ -48,12 +49,9 @@ namespace WebITSC.Admin.Server.Repositorio
             // Consulta para obtener los datos relevantes de las notas
             var notas = await context.Notas
                 .Include(n => n.CursadoMateria)
-                    .ThenInclude(cm => cm.Alumno)
-                        .ThenInclude(a => a.Usuario)
-                            .ThenInclude(u => u.Persona) // Incluimos Persona relacionada
                 .Include(n => n.Evaluacion)
-                .Where(n => n.CursadoMateria.TurnoId == turnoId) // Filtrar por TurnoId
-                .Select(n => new
+                .Where(n => n.CursadoMateria.TurnoId == turnoId && n.Evaluacion.TipoEvaluacion == "Final")
+                .Select(n => new GetNotaDTO
                 {
                     ValorNota = n.ValorNota,
                     Asistencia = n.Asistencia,
@@ -61,26 +59,67 @@ namespace WebITSC.Admin.Server.Repositorio
                     FechaEvaluacion = n.Evaluacion.Fecha,
                     Folio = n.Evaluacion.Folio,
                     Libro = n.Evaluacion.Libro,
-                    Alumno = new
+                    CursadoMateria = n.CursadoMateria == null ? null : new GetCursadoMateriaDTO
                     {
-                        NombreAlumno = n.CursadoMateria.Alumno.Usuario.Persona.Nombre,
-                        ApellidoAlumno = n.CursadoMateria.Alumno.Usuario.Persona.Apellido,
-                        EstadoAlumno = n.CursadoMateria.Alumno.Estado,
-                        Legajo = context.InscripcionesCarrera
+                        CondicionActual = n.CursadoMateria.CondicionActual,
+                        Anno = n.CursadoMateria.Anno,
+                        Alumno = n.CursadoMateria.Alumno == null ? null : new GetAlumnoDTO
+                        {
+                            Estado = n.CursadoMateria.Alumno.Estado,
+                            Nombre = n.CursadoMateria.Alumno.Usuario.Persona.Nombre,
+                            Apellido = n.CursadoMateria.Alumno.Usuario.Persona.Apellido,
+                            Documento = n.CursadoMateria.Alumno.Usuario.Persona.Documento,
+                            TipoDeDocumento = n.CursadoMateria.Alumno.Usuario.Persona.TipoDocumento.Codigo,
+                            Legajo = context.InscripcionesCarrera
                             .Where(ic => ic.AlumnoId == n.CursadoMateria.AlumnoId)
                             .Select(ic => ic.Legajo)
                             .FirstOrDefault()
+                        }
                     },
-                    Materia = turno.MateriaEnPlanEstudio.Materia.Nombre, // Nombre de la materia relacionada
-                    Turno = new
+                    MateriaNombre = n.CursadoMateria.Turno.MateriaEnPlanEstudio.Materia.Nombre,
+                    Turno = n.CursadoMateria.Turno == null ? null : new GetTurnoDTO
                     {
-                        Horario = turno.Horario,
-                        Sede = turno.Sede,
-                        Anno = turno.AnnoCicloLectivo
+                        Horario = n.CursadoMateria.Turno.Horario,
+                        Sede = n.CursadoMateria.Turno.Sede,
+                        AnnoNatural = n.CursadoMateria.Turno.AnnoCicloLectivo
                     }
                 })
                 .ToListAsync();
 
+            #region CódigoViejo 
+            //    .ThenInclude(cm => cm.Alumno)
+            //        .ThenInclude(a => a.Usuario)
+            //            .ThenInclude(u => u.Persona) // Incluimos Persona relacionada
+            //.Include(n => n.Evaluacion)
+            //.Where(n => n.CursadoMateria.TurnoId == turnoId) // Filtrar por TurnoId
+            //.Select(n => new
+            //{
+            //    ValorNota = n.ValorNota,
+            //    Asistencia = n.Asistencia,
+            //    TipoEvaluacion = n.Evaluacion.TipoEvaluacion,
+            //    FechaEvaluacion = n.Evaluacion.Fecha,
+            //    Folio = n.Evaluacion.Folio,
+            //    Libro = n.Evaluacion.Libro,
+            //    Alumno = new
+            //    {
+            //        NombreAlumno = n.CursadoMateria.Alumno.Usuario.Persona.Nombre,
+            //        ApellidoAlumno = n.CursadoMateria.Alumno.Usuario.Persona.Apellido,
+            //        EstadoAlumno = n.CursadoMateria.Alumno.Estado,
+            //        Legajo = context.InscripcionesCarrera
+            //            .Where(ic => ic.AlumnoId == n.CursadoMateria.AlumnoId)
+            //            .Select(ic => ic.Legajo)
+            //            .FirstOrDefault()
+            //    },
+            //    Materia = turno.MateriaEnPlanEstudio.Materia.Nombre, // Nombre de la materia relacionada
+            //    Turno = new
+            //    {
+            //        Horario = turno.Horario,
+            //        Sede = turno.Sede,
+            //        Anno = turno.AnnoCicloLectivo
+            //    }
+            //})
+            //.ToListAsync();
+            #endregion
             return notas;
         }
     }

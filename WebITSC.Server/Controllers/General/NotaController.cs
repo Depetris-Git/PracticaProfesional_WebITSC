@@ -66,11 +66,11 @@ namespace WebITSC.Server.Controllers.General
         //}
 
         [HttpGet("GetNotasByTurno/{turnoId}")]
-        public async Task<IActionResult> GetNotasByTurno(int turnoId)
+        public async Task<ActionResult<List<GetNotaDTO>>> GetNotasByTurno(int turnoId)
         {
             var notas = await eRepositorio.SelectNotasByTurno(turnoId);
 
-            if (notas == null || !notas.Any())
+            if (notas == null)
             {
                 return NotFound("No se encontraron notas para el TurnoId proporcionado.");
             }

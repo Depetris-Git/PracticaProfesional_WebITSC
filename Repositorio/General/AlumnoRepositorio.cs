@@ -2,6 +2,8 @@
 using WebITSC.DB.Data.Entity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebITSC.Shared.General.DTO;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebITSC.Admin.Server.Repositorio
 {
@@ -28,7 +30,7 @@ namespace WebITSC.Admin.Server.Repositorio
                 .ToListAsync();
         }
         //________________________________________________
-        public async Task<ActionResult<IEnumerable<Alumno>>> BuscarAlumnos(string? nombre, string? apellido, string? documento, int? cohorte)
+        public async Task<ActionResult<IEnumerable<BuscarAlumnoDTO>>> BuscarAlumnos(string? nombre, string? apellido, string? documento, int? cohorte)
         {
             var query = context.Alumnos.Include(a => a.Usuario).AsQueryable();
 
@@ -53,7 +55,58 @@ namespace WebITSC.Admin.Server.Repositorio
                 query = query.Where(a => a.InscripcionesCarreras.Any(ic => ic.Cohorte == cohorte));
             }
 
-            var resultados = await query.ToListAsync();
+            var resultados = await query.Select(a => new BuscarAlumnoDTO
+            {
+                Nombre = a.Usuario.Persona.Nombre,
+                Apellido = a.Usuario.Persona.Apellido,
+                Documento = a.Usuario.Persona.Documento,
+                TipoDocumento = a.Usuario.Persona.TipoDocumento.Nombre,
+                Email = a.Usuario.Email,
+                EstadoUsuario = a.Usuario.Estado,
+                Sexo = a.Sexo,
+                FechaNacimiento = a.FechaNacimiento,
+                Edad = a.Edad,
+                Cuil = a.CUIL,
+                Pais = a.Pais,
+                Provincia = a.Provincia,
+                Departamento = a.Departamento,
+                TituloBase = a.TituloBase,
+                FotocopiaDNI = a.FotocopiaDNI,
+                ConstanciaCUIL = a.ConstanciaCUIL,
+                PartidaNacimiento = a.PartidaNacimiento,
+                Analitico = a.Analitico,
+                FotoCarnet = a.FotoCarnet,
+                Cus = a.CUS,
+                EstadoAlumno = a.Estado,
+                Telefono = a.Usuario.Persona.Telefono,
+                Domicilio = a.Usuario.Persona.Domicilio,
+                Certificados = a.CertificadosAlumno.Select(ca => new CertificadoAlumnoDTO
+                {
+                    Id = ca.Id,
+                    FechaEmision = ca.FechaEmision
+                }).ToList(),
+                InscripcionesEnCarreras = a.InscripcionesCarreras.Select(ic => new InscripcionesCarrerasDTO
+                {
+                    NombreCarrera = ic.Carrera.Nombre,
+                    Cohorte = ic.Cohorte,
+                    Legajo = ic.Legajo,
+                    LibroMatriz = ic.LibroMatriz,
+                    NumeroDeOrden = ic.NroOrdenAlumno,
+                    EstadoAlumnoEnCarrera = ic.EstadoAlumno
+
+                }).ToList(),
+                MateriasQueCursa = a.MateriasCursadas.Select(mqc => new MateriasCursadasDTO
+                {
+                    NombreMateria = mqc.Turno.MateriaEnPlanEstudio.Materia.Nombre,
+                    ResolucionMinisterial = mqc.Turno.MateriaEnPlanEstudio.Materia.ResolucionMinisterial,
+                    FechaInscripcion = mqc.FechaInscripcion,
+                    Anno = mqc.Turno.MateriaEnPlanEstudio.Materia.Anno,
+                    Formacion = mqc.Turno.MateriaEnPlanEstudio.Materia.Formacion,
+                    CondicionActual = mqc.CondicionActual,
+                    VencimientoCondicion = mqc.VencimientoCondicion
+                }).ToList()
+
+            }).ToListAsync();
 
             return resultados;
         }
