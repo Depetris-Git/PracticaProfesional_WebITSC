@@ -35,7 +35,7 @@ namespace WebITSC.Admin.Server.UTIL
                 .ForMember(dest => dest.Contrasena, opt => opt.MapFrom(src => src.Contrasena));
 
 
-            CreateMap<Alumno, GetAlumnoDTO>()
+            CreateMap<Alumno, Shared.General.DTO.Alumnos.GetAlumnoDTO>()
                                            .ForMember(dest => dest.NombrePersona, opt => opt.MapFrom(src => src.Usuario.Persona.Nombre))
                                            .ForMember(dest => dest.ApellidoPersona, opt => opt.MapFrom(src => src.Usuario.Persona.Apellido))
                                            .ForMember(dest => dest.DocumentoPersona, opt => opt.MapFrom(src => src.Usuario.Persona.Documento))

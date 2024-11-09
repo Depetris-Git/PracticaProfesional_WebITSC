@@ -2,8 +2,8 @@
 using WebITSC.DB.Data.Entity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WebITSC.Shared.General.DTO;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using WebITSC.Shared.General.DTO.BuscarAlumnosDTOs;
 
 namespace WebITSC.Admin.Server.Repositorio
 {
@@ -62,13 +62,7 @@ namespace WebITSC.Admin.Server.Repositorio
                     query = query.Where(a => a.InscripcionesCarreras.Any(ic => ic.Cohorte == cohorte));
                 }
             }
-            {
-                var resultados = await query.ToListAsync();
-                return resultados;
-            }
-
-        }
-
+            
             var resultados = await query.Select(a => new BuscarAlumnoDTO
             {
                 Nombre = a.Usuario.Persona.Nombre,
@@ -121,6 +115,11 @@ namespace WebITSC.Admin.Server.Repositorio
                 }).ToList()
 
             }).ToListAsync();
+            return resultados;
+            
+        }
+
+            
         public async Task<bool> EliminarAlumno(int alumnoId)
         {
             using (var transaction = await context.Database.BeginTransactionAsync())

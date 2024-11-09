@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WebITSC.Shared.General.DTO
+namespace WebITSC.Shared.General.DTO.BuscarAlumnosDTOs
 {
     public class BuscarAlumnoDTO
     {
@@ -37,7 +37,7 @@ namespace WebITSC.Shared.General.DTO
         public List<InscripcionesCarrerasDTO> InscripcionesEnCarreras { get; set; } = new List<InscripcionesCarrerasDTO>();
 
         public List<MateriasCursadasDTO> MateriasQueCursa { get; set; } = new List<MateriasCursadasDTO>();
-    }   
+    }
 
     public class CertificadoAlumnoDTO
     {

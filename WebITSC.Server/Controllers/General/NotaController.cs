@@ -66,7 +66,7 @@ namespace WebITSC.Server.Controllers.General
         //}
 
         [HttpGet("GetNotasByTurno/{turnoId}")]
-        public async Task<ActionResult<List<GetNotaDTO>>> GetNotasByTurno(int turnoId)
+        public async Task<ActionResult<List<GetNotaNBTDTO>>> GetNotasByTurno(int turnoId)
         {
             var notas = await eRepositorio.SelectNotasByTurno(turnoId);
 

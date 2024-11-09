@@ -9,6 +9,6 @@ namespace WebITSC.Admin.Server.Repositorio
         Task<List<Nota>> FullGetAll();
         Task<Nota> FullGetById(int id);
         
-        Task<List<GetNotaDTO>> SelectNotasByTurno(int turnoId);
+        Task<List<GetNotaNBTDTO>> SelectNotasByTurno(int turnoId);
     }
 }

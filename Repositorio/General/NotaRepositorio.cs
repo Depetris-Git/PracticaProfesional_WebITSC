@@ -34,7 +34,7 @@ namespace WebITSC.Admin.Server.Repositorio
                 .ToListAsync();
         }
 
-        public async Task<List<GetNotaDTO>> SelectNotasByTurno(int turnoId)
+        public async Task<List<GetNotaNBTDTO>> SelectNotasByTurno(int turnoId)
         {
             // Verificamos que exista el turno
             var turno = await context.Turnos
@@ -51,7 +51,7 @@ namespace WebITSC.Admin.Server.Repositorio
                 .Include(n => n.CursadoMateria)
                 .Include(n => n.Evaluacion)
                 .Where(n => n.CursadoMateria.TurnoId == turnoId && n.Evaluacion.TipoEvaluacion == "Final")
-                .Select(n => new GetNotaDTO
+                .Select(n => new GetNotaNBTDTO
                 {
                     ValorNota = n.ValorNota,
                     Asistencia = n.Asistencia,
@@ -59,11 +59,11 @@ namespace WebITSC.Admin.Server.Repositorio
                     FechaEvaluacion = n.Evaluacion.Fecha,
                     Folio = n.Evaluacion.Folio,
                     Libro = n.Evaluacion.Libro,
-                    CursadoMateria = n.CursadoMateria == null ? null : new GetCursadoMateriaDTO
+                    CursadoMateria = n.CursadoMateria == null ? null : new GetCursadoMateriaNBTDTO
                     {
                         CondicionActual = n.CursadoMateria.CondicionActual,
                         Anno = n.CursadoMateria.Anno,
-                        Alumno = n.CursadoMateria.Alumno == null ? null : new GetAlumnoDTO
+                        Alumno = n.CursadoMateria.Alumno == null ? null : new GetAlumnoNBTDTO
                         {
                             Estado = n.CursadoMateria.Alumno.Estado,
                             Nombre = n.CursadoMateria.Alumno.Usuario.Persona.Nombre,
@@ -77,7 +77,7 @@ namespace WebITSC.Admin.Server.Repositorio
                         }
                     },
                     MateriaNombre = n.CursadoMateria.Turno.MateriaEnPlanEstudio.Materia.Nombre,
-                    Turno = n.CursadoMateria.Turno == null ? null : new GetTurnoDTO
+                    Turno = n.CursadoMateria.Turno == null ? null : new GetTurnoNBTDTO
                     {
                         Horario = n.CursadoMateria.Turno.Horario,
                         Sede = n.CursadoMateria.Turno.Sede,

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebITSC.Shared.General.DTO;
 using WebITSC.DB.Data.Entity;
+using WebITSC.Shared.General.DTO.BuscarAlumnosDTOs;
 
 namespace WebITSC.Admin.Server.Repositorio
 {

@@ -6,6 +6,7 @@ using WebITSC.Shared.General.DTO.Alumnos;
 using WebITSC.Shared.General.DTO.Persona;
 using WebITSC.Shared.General.DTO.UsuariosDTO;
 using Repositorio.General;
+using WebITSC.Shared.General.DTO.BuscarAlumnosDTOs;
 
 
 namespace WebITSC.Server.Controllers.General
@@ -62,34 +63,7 @@ namespace WebITSC.Server.Controllers.General
             if (alumno == null) return NotFound();
             return Ok(alumno);
         }
-        #region Peticiones Get
-
-        //[HttpGet]
-        //public async Task<ActionResult<List<Alumno>>> Get()
-        //{
-        //    return await repositorio.Select();
-        //}
-
-        //[HttpGet("{id:int}")]
-        //public async Task<ActionResult<Alumno>> Get(int id)
-        //{
-        //    Alumno? sel = await repositorio.SelectById(id);
-        //    if (sel == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return sel;
-        //}
-
-        //[HttpGet("existe/{id:int}")]
-        //public async Task<ActionResult<bool>> Existe(int id)
-        //{
-        //    var existe = await repositorio.Existe(id);
-        //    return existe;
-
-        //}
-
-
+        
 
         //GET: api/alumnos/buscar
         [HttpGet("buscar")]
@@ -101,7 +75,7 @@ namespace WebITSC.Server.Controllers.General
         {
             var alumnos = await eRepositorio.BuscarAlumnos(nombre, apellido, documento, cohorte);
 
-            if (alumnos == null || !alumnos.Any())
+            if (alumnos == null)
             {
                 return NotFound("No se encontraron alumnos.");
             }
@@ -109,7 +83,7 @@ namespace WebITSC.Server.Controllers.General
             return Ok(alumnos.Value);
         }
 
-        #endregion
+        
 
         // Crear nuevo alumno
         [HttpPost]

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WebITSC.Shared.General.DTO
 {
-    public class GetNotaDTO
+    public class GetNotaNBTDTO
     {
         public int ValorNota { get; set; }
 
@@ -20,21 +20,21 @@ namespace WebITSC.Shared.General.DTO
         public string Libro { get; set; }
        
 
-        public GetCursadoMateriaDTO CursadoMateria { get; set; } //Materia que se da en el turno
+        public GetCursadoMateriaNBTDTO CursadoMateria { get; set; } //Materia que se da en el turno
 
         public string MateriaNombre { get; set; }
 
-        public GetTurnoDTO Turno { get; set; }
+        public GetTurnoNBTDTO Turno { get; set; }
 
     }
 
-    public class GetCursadoMateriaDTO
+    public class GetCursadoMateriaNBTDTO
     {
         public string CondicionActual { get; set; }
         public int Anno { get; set; }
-        public GetAlumnoDTO Alumno { get; set; }
+        public GetAlumnoNBTDTO Alumno { get; set; }
     }
-    public class GetAlumnoDTO
+    public class GetAlumnoNBTDTO
     {
         public bool Estado { get; set; }
 
@@ -48,7 +48,7 @@ namespace WebITSC.Shared.General.DTO
         public string Legajo { get; set; }
     }
 
-    public class GetTurnoDTO
+    public class GetTurnoNBTDTO
     {
         public string Horario { get; set; }
 
