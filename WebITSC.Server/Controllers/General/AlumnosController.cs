@@ -45,12 +45,17 @@ namespace WebITSC.Server.Controllers.General
         [HttpGet]
         public async Task<ActionResult<List<GetAlumnoDTO>>> GetAll()
         {
-            var alumno = await eRepositorio.FullGetAll();
-            return Ok(alumno);
-        }
+            // Obtener todos los alumnos
+            var alumnos = await eRepositorio.FullGetAll();
 
-        // Obtener alumno por ID
-        [HttpGet("{id:int}")]
+            // Usar AutoMapper para mapear la lista de 'Usuario' a 'GetUsuarioDTO'
+            var alumnosDTO = mapper.Map<List<GetAlumnoDTO>>(alumnos);
+
+            // Devolver la respuesta mapeada
+            return Ok(alumnosDTO);
+        }
+            // Obtener alumno por ID
+            [HttpGet("{id:int}")]
         public async Task<ActionResult<GetAlumnoDTO>> GetById(int id)
         {
             var alumno = await eRepositorio.FullGetById(id);
@@ -208,24 +213,27 @@ namespace WebITSC.Server.Controllers.General
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
-            // Verifica si el alumno existe antes de intentar eliminarlo
-            var existe = await eRepositorio.Existe(id);
-            if (!existe)
+            // Verifica si el alumno existe
+            var alumnoExistente = await eRepositorio.FullGetById(id);
+            if (alumnoExistente == null)
             {
                 return NotFound($"El alumno con ID {id} no existe.");
             }
 
-            // Procede a eliminar el alumno
-            var alumnoEliminado = await eRepositorio.Delete(id);
-            if (alumnoEliminado)
+            // Llamamos al repositorio para eliminar el alumno
+            var resultado = await eRepositorio.EliminarAlumno(id);
+
+            if (resultado)
             {
                 return Ok($"El alumno con ID {id} fue eliminado correctamente.");
             }
             else
             {
-                return BadRequest("No se pudo eliminar el alumno.");
+                return BadRequest("No se pudo eliminar el alumno. Ocurrió un error.");
             }
         }
+
+
     }
 }
 

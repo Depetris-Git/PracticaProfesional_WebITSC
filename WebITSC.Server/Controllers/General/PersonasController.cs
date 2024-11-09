@@ -4,6 +4,7 @@ using WebITSC.DB.Data;
 using WebITSC.DB.Data.Entity;
 using Microsoft.AspNetCore.Mvc;
 using WebITSC.Shared.General.DTO.Persona;
+using WebITSC.Shared.General.DTO.Alumnos;
 
 namespace WebITSC.Server.Controllers.General
 {
@@ -26,9 +27,14 @@ namespace WebITSC.Server.Controllers.General
         [HttpGet]
         public async Task<ActionResult<List<GetPersonaDTO>>> GetAll()
         {
+            // Obtener todos los alumnos
             var personas = await eRepositorio.FullGetAll();
 
-            return Ok(personas);
+            // Usar AutoMapper para mapear la lista de 'Usuario' a 'GetUsuarioDTO'
+            var personasDTO = mapper.Map<List<GetPersonaDTO>>(personas);
+
+            // Devolver la respuesta mapeada
+            return Ok(personasDTO); ;
         }
 
         [HttpGet("{id:int}")]

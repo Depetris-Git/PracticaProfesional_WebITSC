@@ -18,7 +18,7 @@ namespace WebITSC.Shared.General.DTO.InscripcionCarrera
         public int CarreraId { get; set; }
         //public Carrera Carrera { get; set; }
 
-        [Required(ErrorMessage = "El ID de la carrera es necesario")]
+        [Required(ErrorMessage = "El cohorte de la carrera es necesario")]
         public int Cohorte { get; set; }
 
         //[Required(ErrorMessage = "El legajo es necesario")]

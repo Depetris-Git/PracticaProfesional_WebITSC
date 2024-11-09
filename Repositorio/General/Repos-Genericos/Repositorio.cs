@@ -83,20 +83,41 @@ namespace WebITSC.Admin.Server.Repositorio
         {
             try
             {
-                var entidad = await SelectById(id);
+                // Buscar la entidad por su ID
+                var entidad = await context.Set<E>().FindAsync(id);
+
                 if (entidad == null)
                 {
+                    // Si la entidad no existe, retornar false
                     return false;
                 }
 
+                // Eliminar la entidad del contexto
                 context.Set<E>().Remove(entidad);
+
+                // Intentar guardar los cambios en la base de datos
                 await context.SaveChangesAsync();
+
                 return true;
+            }
+            catch (DbUpdateException ex)
+            {
+                // Si ocurre una excepción al guardar los cambios, loguearla
+                // Esto es común cuando hay violación de restricciones de base de datos como claves foráneas
+                Console.WriteLine($"Error al eliminar la entidad: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Excepción interna: {ex.InnerException.Message}");
+                }
+
+                // Retornar false si ocurre un error
+                return false;
             }
             catch (Exception ex)
             {
-                // Log el error (puedes agregar un log adecuado aquí)
-                throw new Exception($"Ocurrió un error al eliminar la entidad con ID {id}: {ex.Message}");
+                // Captura cualquier otra excepción que pueda ocurrir
+                Console.WriteLine($"Error inesperado: {ex.Message}");
+                return false;
             }
         }
 

@@ -11,8 +11,8 @@ namespace WebITSC.Shared.General.DTO.UsuariosDTO
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "La persona que es usuario es necesaria")]
-        public int PersonaId { get; set; }
+        //[Required(ErrorMessage = "La persona que es usuario es necesaria")]
+        //public int PersonaId { get; set; }
 
         [Required(ErrorMessage = "El nombre es necesario")]
         [MaxLength(80, ErrorMessage = "Máximo número de caracteres {1}.")]

@@ -8,6 +8,6 @@ namespace WebITSC.Admin.Server.Repositorio
         Task<IEnumerable<Alumno>> BuscarAlumnos(string? nombre, string? apellido, string? documento, int? cohorte);
         Task<List<Alumno>> FullGetAll();
         Task<Alumno> FullGetById(int id);
-        //Task<int> Insert(Alumno entidad);
+        Task<bool> EliminarAlumno(int alumnoId);
     }
 }

@@ -24,10 +24,14 @@ namespace WebITSC.Server.Controllers.General
         }
         [HttpGet]
         public async Task<ActionResult<List<GetUsuarioDTO>>> GetAll()
-        {
+        {// Obtener todos los usuarios
             var usuarios = await eRepositorio.FullGetAll();
 
-            return Ok(usuarios);
+            // Usar AutoMapper para mapear la lista de 'Usuario' a 'GetUsuarioDTO'
+            var usuariosDTO = mapper.Map<List<GetUsuarioDTO>>(usuarios);
+
+            // Devolver la respuesta mapeada
+            return Ok(usuariosDTO);
         }
 
         [HttpGet("{id:int}")]

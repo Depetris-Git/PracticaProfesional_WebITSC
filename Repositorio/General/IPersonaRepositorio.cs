@@ -8,5 +8,6 @@ namespace WebITSC.Admin.Server.Repositorio
         Task<List<Persona>> FullGetAll();
         Task FullInsert(Persona persona);
         Task FullUpdate(Persona persona);
+        //Task<Persona> ObtenerPersonaConCohorte(int personaId);
     }
 }

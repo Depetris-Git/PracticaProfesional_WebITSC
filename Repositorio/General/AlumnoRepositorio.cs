@@ -68,54 +68,69 @@ namespace WebITSC.Admin.Server.Repositorio
 
         }
 
-        // Implementación del método Insert para agregar un Alumno
-        //public async Task<int> Insert(Alumno entidad)
-        //{
-        //    // Asegúrate de que la entidad no sea nula
-        //    if (entidad == null)
-        //    {
-        //        throw new ArgumentNullException(nameof(entidad));
-        //    }
+        public async Task<bool> EliminarAlumno(int alumnoId)
+        {
+            using (var transaction = await context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    // 1. Eliminar las inscripciones en carreras relacionadas con el alumno
+                    var inscripciones = await context.InscripcionesCarrera
+                        .Where(i => i.AlumnoId == alumnoId)
+                        .ToListAsync();
 
-        //    // Agregar el alumno al DbContext
-        //    await context.Alumnos.AddAsync(entidad);
+                    if (inscripciones.Any())
+                    {
+                        context.InscripcionesCarrera.RemoveRange(inscripciones);  // Eliminar todas las inscripciones
+                        await context.SaveChangesAsync();  // Guardar cambios
+                    }
 
-        //    // Guardar los cambios en la base de datos
-        //    await context.SaveChangesAsync();
+                    // 2. Eliminar el alumno
+                    var alumno = await context.Alumnos
+                        .Where(a => a.Id == alumnoId)
+                        .FirstOrDefaultAsync();
 
-        //    // Devuelve el ID del nuevo alumno creado
-        //    return entidad.Id;
-        //}
+                    if (alumno != null)
+                    {
+                        context.Alumnos.Remove(alumno);  // Eliminar el alumno
+                        await context.SaveChangesAsync();  // Guardar cambios
+                    }
 
+                    // 3. Eliminar el usuario asociado al alumno
+                    var usuario = await context.Usuarios
+                        .Where(u => u.Id == alumno.UsuarioId)
+                        .FirstOrDefaultAsync();
 
-        //------------------------------------------------------------------------------------------------
-        // Implementación del método Update para actualizar un Alumno existente
-        //public async Task Update(int id, Alumno entidad)
-        //{
-        //    // Verificamos si el alumno con el ID especificado existe
-        //    var alumnoExistente = await context.Alumnos.FindAsync(id);
+                    if (usuario != null)
+                    {
+                        context.Usuarios.Remove(usuario);  // Eliminar el usuario
+                        await context.SaveChangesAsync();  // Guardar cambios
+                    }
 
-        //    if (alumnoExistente == null)
-        //    {
-        //        // Si el alumno no existe, puedes manejar el error (retornar un NotFound, por ejemplo)
-        //        throw new KeyNotFoundException("Alumno no encontrado");
-        //    }
+                    // 4. Eliminar la persona asociada al usuario
+                    var persona = await context.Personas
+                        .Where(p => p.Id == usuario.PersonaId)
+                        .FirstOrDefaultAsync();
 
-        //    // Actualizamos los campos de la entidad existente con los nuevos valores
-        //    alumnoExistente.Nombre = entidad.Nombre;
-        //    alumnoExistente.Apellido = entidad.Apellido;
-        //    alumnoExistente.Documento = entidad.Documento;
-        //    alumnoExistente.Sexo = entidad.Sexo;
-        //    alumnoExistente.FechaNacimiento = entidad.FechaNacimiento;
-        //    alumnoExistente.Edad = entidad.Edad;
-        //    alumnoExistente.CUIL = entidad.CUIL;
-        //    alumnoExistente.Pais = entidad.Pais;
-        //    alumnoExistente.Provincia = entidad.Provincia;
-        //    alumnoExistente.Departamento = entidad.Departamento;
+                    if (persona != null)
+                    {
+                        context.Personas.Remove(persona);  // Eliminar la persona
+                        await context.SaveChangesAsync();  // Guardar cambios
+                    }
 
-        //    // Guardar los cambios en la base de datos
-        //    await context.SaveChangesAsync();
-        //}
+                    // Confirmar la transacción
+                    await transaction.CommitAsync();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();  // Revertir los cambios en caso de error
+                                                        // Loguear el error si es necesario
+                    return false;
+                }
 
+            }
+
+        } 
     }
 }
