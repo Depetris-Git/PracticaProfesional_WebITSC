@@ -1,32 +1,237 @@
 ﻿@page "/Alumnos-si"
 @inject IHttpServicios http
+@inject HttpClient http
+@inject NavigationManager Navigation
+@using System.Net.Http.Json
+@using WebITSC.Shared.General.DTO.Alumnos
 
 <h3>Alumnos</h3>
 
+<EditForm Model="crearAlumno" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
+    <div class="form-group">
+        <label for="CarreraId">Carrera</label>
+        <InputSelect class="form-control" id="CarreraId" @bind-Value="crearAlumno.CarreraId">
+            <option value="">Seleccione...</option>
+            @foreach (var carrera in carreras)
+            {
+                <option value="@carrera.Id">@carrera.Nombre</option>
+            }
+        </InputSelect>
+    </div>
 
+    <div class="form-group">
+        <label for="Nombre">Nombre</label>
+        <InputText class="form-control" id="Nombre" @bind-Value="crearAlumno.Nombre" />
+    </div>
 
+    <div class="form-group">
+        <label for="Apellido">Apellido</label>
+        <InputText class="form-control" id="Apellido" @bind-Value="crearAlumno.Apellido" />
+    </div>
 
+    <div class="form-group">
+        <label for="Documento">Documento</label>
+        <InputText class="form-control" id="Documento" @bind-Value="crearAlumno.Documento" />
+    </div>
 
+    <div class="form-group">
+        <label for="TipoDocumentoId">Tipo de Documento</label>
+        <InputSelect class="form-control" id="TipoDocumentoId" @bind-Value="crearAlumno.TipoDocumentoId">
+            <option value="">Seleccione...</option>
+            @foreach (var tipo in tiposDocumentos)
+            {
+                <option value="@tipo.Id">@tipo.Nombre</option>
+            }
+        </InputSelect>
+    </div>
 
+    <div class="form-group">
+        <label for="Telefono">Teléfono</label>
+        <InputText class="form-control" id="Telefono" @bind-Value="crearAlumno.Telefono" />
+    </div>
 
+    <div class="form-group">
+        <label for="Domicilio">Domicilio</label>
+        <InputText class="form-control" id="Domicilio" @bind-Value="crearAlumno.Domicilio" />
+    </div>
 
+    <div class="form-group">
+        <label for="Email">Email</label>
+        <InputText class="form-control" id="Email" @bind-Value="crearAlumno.Email" />
+    </div>
 
+    <div class="form-group">
+        <label for="Contrasena">Contraseña</label>
+        <InputText class="form-control" id="Contrasena" @bind-Value="crearAlumno.Contrasena" />
+    </div>
 
+    <div class="form-group">
+        <label for="Sexo">Sexo</label>
+        <InputText class="form-control" id="Sexo" @bind-Value="crearAlumno.Sexo" />
+    </div>
 
+    <div class="form-group">
+        <label for="FechaNacimiento">Fecha de Nacimiento</label>
+        <InputDate class="form-control" id="FechaNacimiento" @bind-Value="crearAlumno.FechaNacimiento" />
+    </div>
 
+    <div class="form-group">
+        <label for="Edad">Edad</label>
+        <InputNumber class="form-control" id="Edad" @bind-Value="crearAlumno.Edad" />
+    </div>
 
+    <div class="form-group">
+        <label for="Pais">País</label>
+        <InputText class="form-control" id="Pais" @bind-Value="crearAlumno.Pais" />
+    </div>
 
+    <div class="form-group">
+        <label for="CUIL">CUIL</label>
+        <InputText class="form-control" id="CUIL" @bind-Value="crearAlumno.CUIL" />
+    </div>
 
+    <div class="form-group">
+        <label for="Titulo Base">TituloBase</label>
+        <InputText class="form-control" id="CUIL" @bind-Value="crearAlumno.TituloBase" />
+    </div>
 
+    <!-- Modificación de los checkboxes -->
+    <div class="form-group">
+        <label for="TieneFotocopiaDNI">Fotocopia de DNI</label>
+        <InputCheckbox class="form-check-input" id="TieneFotocopiaDNI" @bind-Value="FotocopiaDNIBool" />
+    </div>
 
+    <div class="form-group">
+        <label for="TieneConstanciaCUIL">Constancia CUIL</label>
+        <InputCheckbox class="form-check-input" id="TieneConstanciaCUIL" @bind-Value="ConstanciaCUILBool" />
+    </div>
 
+    <div class="form-group">
+        <label for="TienePartidaNacimiento">Partida de Nacimiento</label>
+        <InputCheckbox class="form-check-input" id="TienePartidaNacimiento" @bind-Value="PartidaNacimientoBool" />
+    </div>
 
+    <div class="form-group">
+        <label for="TieneAnalitico">Analítico</label>
+        <InputCheckbox class="form-check-input" id="TieneAnalitico" @bind-Value="AnaliticoBool" />
+    </div>
 
+    <div class="form-group">
+        <label for="TieneFotoCarnet">Foto Carnet</label>
+        <InputCheckbox class="form-check-input" id="TieneFotoCarnet" @bind-Value="FotoCarnetBool" />
+    </div>
 
+    <div class="form-group">
+        <label for="TieneCUS">CUS</label>
+        <InputCheckbox class="form-check-input" id="TieneCUS" @bind-Value="CUSBool" />
+    </div>
 
+   @*   <div class="form-group">
+        <label for="Cohorte">Cohorte</label>
+        <InputNumber class="form-control" id="Edad" @bind-Value="crearAlumno.Cohorte" />
+    </div>  *@
 
+    <button type="submit" class="btn btn-primary">Crear Alumno</button>
+</EditForm>
 
 @code {
+    private CrearAlumnoDTO crearAlumno = new CrearAlumnoDTO();
+    private List<TipoDocumento> tiposDocumentos = new List<TipoDocumento>();
+    private List<Carrera> carreras = new List<Carrera>();
 
+    // Propiedades booleanas que se vinculan con los checkboxes
+    private bool FotocopiaDNIBool
+    {
+        get => crearAlumno.FotocopiaDNI == "Sí";
+        set => crearAlumno.FotocopiaDNI = value ? "Sí" : "No";
+    }
+
+    private bool ConstanciaCUILBool
+    {
+        get => crearAlumno.ConstanciaCUIL == "Sí";
+        set => crearAlumno.ConstanciaCUIL = value ? "Sí" : "No";
+    }
+
+    private bool PartidaNacimientoBool
+    {
+        get => crearAlumno.PartidaNacimiento == "Sí";
+        set => crearAlumno.PartidaNacimiento = value ? "Sí" : "No";
+    }
+
+    private bool AnaliticoBool
+    {
+        get => crearAlumno.Analitico == "Sí";
+        set => crearAlumno.Analitico = value ? "Sí" : "No";
+    }
+
+    private bool FotoCarnetBool
+    {
+        get => crearAlumno.FotoCarnet == "Sí";
+        set => crearAlumno.FotoCarnet = value ? "Sí" : "No";
+    }
+
+    private bool CUSBool
+    {
+        get => crearAlumno.CUS == "Sí";
+        set => crearAlumno.CUS = value ? "Sí" : "No";
+    }
+
+  
+    // Este método se ejecuta al cargar la página
+    protected override async Task OnInitializedAsync()
+    {
+        // Cargar tipos de documentos y carreras desde el API
+        tiposDocumentos = await http.GetFromJsonAsync<List<TipoDocumento>>("api/TipoDocumento");
+        carreras = await http.GetFromJsonAsync<List<Carrera>>("api/Carreras");
+    }
+
+    // Este método se ejecuta cuando el formulario es enviado y válido
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            // Enviar datos al backend para crear el alumno
+            var response = await http.PostAsJsonAsync("api/Alumnos", crearAlumno);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Redirigir a la lista de alumnos o a una página de éxito
+                Navigation.NavigateTo("/lista-alumnos");
+            }
+            else
+            {
+                // Manejar el error, por ejemplo, mostrar un mensaje de error
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error: {errorMessage}");
+            }
+        }
+        catch (Exception ex)
+        {
+            // Manejar el error de conexión o cualquier otra excepción
+            Console.WriteLine($"Exception: {ex.Message}");
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

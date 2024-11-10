@@ -11,7 +11,7 @@ namespace WebITSC.Shared.General.DTO.Alumnos
     {
         public int Id { get; set; }
         public int CarreraId { get; set; }  // Carrera en la que se va a inscribir
-
+        public string NameCarrera { get; set; }
         public string NombrePersona { get; set; }
         public string ApellidoPersona { get; set; }
         public string DocumentoPersona { get; set; }
