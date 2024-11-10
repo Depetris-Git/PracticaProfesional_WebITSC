@@ -42,7 +42,7 @@ namespace WebITSC.Admin.Client.Servicios
             }
         }
 
-        private async Task<O> DesSerealizar<O>(HttpResponseMessage response)
+        private async Task<O?> DesSerealizar<O>(HttpResponseMessage response)
         {
             var respuesta = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<O>(respuesta, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });

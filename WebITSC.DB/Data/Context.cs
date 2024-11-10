@@ -1,14 +1,10 @@
-﻿using WebITSC.DB.Data.Entity;
+﻿
+using WebITSC.DB.Data.Entity;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WebITSC.DB.Data
 {
-    public class Context : DbContext
+	public class Context : DbContext
     {
         public DbSet<Alumno> Alumnos { get; set; }
         public DbSet<Carrera> Carreras { get; set; }

@@ -1,0 +1,65 @@
+﻿@page "/api/Nota"
+@inject IHttpServicios http
+
+<h2>Lista de Nota Final</h2>
+<br />
+<table>
+	<tr>
+		<th>Valor Nota</th>
+		<th>Asistencia</th>
+	</tr>
+	@if (Mensaje == "")
+	{
+		@if (listaNota == null)
+		{
+			<p>Buscando...</p>
+		}
+		else if (listaNota.Count == 0)
+		{
+			<p>No existe ninguna nota.</p>
+		}
+		else
+		{
+			@foreach (var item in listaNota)
+			{
+				<tr>
+					<td>@item.CursadoMateria</td>
+					<td>@item.Evaluacion</td>
+					<td>@item.ValorNota</td>
+					<td>@item.Asistencia</td>
+				</tr>
+			}
+		}
+	}
+	else
+	{
+		<p> Error: @Mensaje</p>
+	}
+</table>
+
+
+@code {
+	List<Nota> listaNota;
+	Nota nota;
+	string Mensaje = "";
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+		await Leer();
+	}
+
+	private async Task Leer()
+	{
+		var resp = await http.Get<List<Nota>>("/api/Nota");
+		if (!resp.Error)
+		{
+			listaNota = resp.Respuesta;
+		}
+		else
+		{
+			Mensaje = await resp.ObtenerError();
+		}
+	}
+
+}
