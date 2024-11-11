@@ -1,14 +1,32 @@
 ﻿@page "/lista-alumnos"
 @using WebITSC.Shared.General.DTO.Alumnos
+@using WebITSC.Shared.General.DTO.BuscarAlumnosDTOs
+@using WebITSC.Shared.General.DTO.Carreraa
 @inject HttpClient http
 @inject NavigationManager Navigation
 
 <h3>Lista de Alumnos</h3>
 
-<!-- Filtro de búsqueda -->
+<!-- Filtros de búsqueda -->
 <div class="form-group">
     <label for="search">Buscar</label>
     <InputText class="form-control" id="search" @bind-Value="searchTerm" placeholder="Buscar por nombre, apellido, documento, etc..." />
+</div>
+
+<div class="form-group">
+    <label for="carreraFilter">Filtrar por Carrera</label>
+    <InputSelect class="form-control" id="carreraFilter" @bind-Value="selectedCarrera">
+        <option value="">Seleccione una carrera</option>
+        @foreach (var carrera in availableCarreras)
+        {
+            <option value="@carrera.Id">@carrera.Nombre</option>
+        }
+    </InputSelect>
+</div>
+
+<div class="form-group">
+    <label for="cohorteFilter">Filtrar por Cohorte</label>
+    <InputNumber class="form-control" id="cohorteFilter" @bind-Value="selectedCohorte" />
 </div>
 
 <!-- Tabla de Alumnos -->
@@ -38,12 +56,12 @@
         @foreach (var alumno in FilteredAlumnos)
         {
             <tr>
-                <td>@alumno.NameCarrera</td>
-                <td>@alumno.NombrePersona</td>
-                <td>@alumno.ApellidoPersona</td>
-                <td>@alumno.DocumentoPersona</td>
-                <td>@(alumno.Cohorte != 0 ? alumno.Cohorte.ToString() : DateTime.Now.Year.ToString())</td>
-                <td>@alumno.CUIL</td>
+                <td>@alumno.InscripcionesEnCarreras.FirstOrDefault()?.NombreCarrera</td>
+                <td>@alumno.Nombre</td>
+                <td>@alumno.Apellido</td>
+                <td>@alumno.Documento</td>
+                <td>@(alumno.InscripcionesEnCarreras.FirstOrDefault()?.Cohorte.ToString() ?? "Sin cohorte")</td>
+                <td>@alumno.Cuil</td>
                 <td>@alumno.Pais</td>
                 <td>@alumno.Provincia</td>
                 <td>@alumno.Departamento</td>
@@ -53,32 +71,51 @@
                 <td>@alumno.PartidaNacimiento</td>
                 <td>@alumno.Analitico</td>
                 <td>@alumno.FotoCarnet</td>
-                <td>@alumno.CUS</td>
-                <td>@(alumno.Estado ? "Activo" : "Inactivo")</td>
-             
+                <td>@alumno.Cus</td>
+                <td>@(alumno.EstadoAlumno ? "Activo" : "Inactivo")</td>
             </tr>
         }
     </tbody>
 </table>
 
 @code {
-    private List<GetAlumnoDTO> alumnos = new List<GetAlumnoDTO>();
+    private List<BuscarAlumnoDTO> alumnos = new List<BuscarAlumnoDTO>();
+    private List<GetCarreraDTO> availableCarreras = new List<GetCarreraDTO>(); // Carreras obtenidas del backend
+    private string selectedCarrera = string.Empty;  // Carrera seleccionada
+    private int? selectedCohorte = null;  // Cohorte seleccionado
     private string searchTerm = string.Empty;
 
     // Propiedad calculada para obtener los alumnos filtrados
-    private IEnumerable<GetAlumnoDTO> FilteredAlumnos
+    private IEnumerable<BuscarAlumnoDTO> FilteredAlumnos
     {
         get
         {
-            if (string.IsNullOrWhiteSpace(searchTerm))
-                return alumnos;
+            var filtered = alumnos.AsEnumerable();
 
-            return alumnos.Where(a =>
-                a.NombrePersona.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                a.ApellidoPersona.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
-                a.DocumentoPersona.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) 
-                //por cohorteee
-            );
+            // Filtrar por el término de búsqueda
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                filtered = filtered.Where(a =>
+                    a.Nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    a.Apellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    a.Documento.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+            }
+
+            // Filtrar por Carrera seleccionada
+            if (!string.IsNullOrWhiteSpace(selectedCarrera))
+            {
+                filtered = filtered.Where(a => a.InscripcionesEnCarreras
+                    .Any(ic => ic.NombreCarrera.Contains(selectedCarrera, StringComparison.OrdinalIgnoreCase)));
+            }
+
+            // Filtrar por Cohorte seleccionado
+            if (selectedCohorte.HasValue)
+            {
+                filtered = filtered.Where(a => a.InscripcionesEnCarreras
+                    .Any(ic => ic.Cohorte == selectedCohorte.Value));
+            }
+
+            return filtered;
         }
     }
 
@@ -88,21 +125,27 @@
         try
         {
             // Obtener la lista de alumnos del API
-            alumnos = await http.GetFromJsonAsync<List<GetAlumnoDTO>>("api/Alumnos");
+            alumnos = await http.GetFromJsonAsync<List<BuscarAlumnoDTO>>("api/alumnos/buscar");
+
+            // Obtener las carreras disponibles del API
+            availableCarreras = await http.GetFromJsonAsync<List<GetCarreraDTO>>("api/carreras");
 
             // Si no obtenemos datos, asignamos una lista vacía
             if (alumnos == null)
             {
-                alumnos = new List<GetAlumnoDTO>();
+                alumnos = new List<BuscarAlumnoDTO>();
+            }
+            if (availableCarreras == null)
+            {
+                availableCarreras = new List<GetCarreraDTO>();
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error al obtener los alumnos: {ex.Message}");
+            Console.WriteLine($"Error al obtener los alumnos o carreras: {ex.Message}");
         }
     }
 }
-
 
 
 

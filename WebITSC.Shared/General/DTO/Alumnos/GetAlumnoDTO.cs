@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebITSC.Shared.General.DTO.BuscarAlumnosDTOs;
 
 namespace WebITSC.Shared.General.DTO.Alumnos
 {
@@ -66,6 +67,7 @@ namespace WebITSC.Shared.General.DTO.Alumnos
 
         //_cohorte_____________________________________________________________________
        public int Cohorte { get; set; }
+       public List<InscripcionesCarrerasDTO> InscripcionesEnCarreras { get; set; } = new List<InscripcionesCarrerasDTO>();
 
     }
 }

@@ -9,6 +9,8 @@ namespace WebITSC.Shared.General.DTO.Carreraa
 {
     public class GetCarreraDTO
     {
+        public int Id { get; set; }    
+
         [Required(ErrorMessage = "El nombre de la carrera es necesario")]
         [MaxLength(40, ErrorMessage = "Máximo número de caracteres {1}.")]
         public string Nombre { get; set; }
