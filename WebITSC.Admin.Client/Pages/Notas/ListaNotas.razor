@@ -1,10 +1,13 @@
 ﻿@page "/api/Nota"
+@using WebITSC.Shared.General.DTO
 @inject IHttpServicios http
 
 <h2>Lista de Nota Final</h2>
 <br />
 <table>
 	<tr>
+		<th>Cursado Materia</th>
+		<th>Evaluación</th>
 		<th>Valor Nota</th>
 		<th>Asistencia</th>
 	</tr>
@@ -39,6 +42,7 @@
 
 
 @code {
+
 	List<Nota> listaNota;
 	Nota nota;
 	string Mensaje = "";
@@ -51,14 +55,14 @@
 
 	private async Task Leer()
 	{
-		var resp = await http.Get<List<Nota>>("/api/Nota");
-		if (!resp.Error)
+		var respuesta = await http.Get<List<Nota>>("api/Nota");
+		if (!respuesta.Error)
 		{
-			listaNota = resp.Respuesta;
+			listaNota = respuesta.Respuesta;
 		}
 		else
 		{
-			Mensaje = await resp.ObtenerError();
+			Mensaje = await respuesta.ObtenerError();
 		}
 	}
 

@@ -17,6 +17,7 @@ namespace WebITSC.Admin.Server.UTIL
         {
             CreateMap<CrearAlumnoDTO, Alumno>();
 
+
             // Mapeo de CrearAlumnoDTO a Persona
             CreateMap<CrearAlumnoDTO, Persona>()
                                     .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Nombre))
@@ -25,10 +26,8 @@ namespace WebITSC.Admin.Server.UTIL
                                     .ForMember(dest => dest.TipoDocumentoId, opt => opt.MapFrom(src => src.TipoDocumentoId))
                                     .ForMember(dest => dest.Telefono, opt => opt.MapFrom(src => src.Telefono))
                                     .ForMember(dest => dest.Domicilio, opt => opt.MapFrom(src => src.Domicilio));
-            
-            
 
-
+            
             // Mapeo de CrearAlumnoDTO a Usuario (también podrías hacerlo si la lógica de tu usuario depende del DTO)
             CreateMap<CrearAlumnoDTO, Usuario>()
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
@@ -43,8 +42,8 @@ namespace WebITSC.Admin.Server.UTIL
                                            .ForMember(dest => dest.DomicilioPersona, opt => opt.MapFrom(src => src.Usuario.Persona.Domicilio))
                                            .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => src.Estado)) // Si deseas incluir Estado también
                                            .ForMember(dest => dest.Cohorte, opt => opt.MapFrom(src => src.InscripcionesCarreras.FirstOrDefault().Cohorte))
-                                           .ForMember(dest => dest.CarreraId, opt => opt.MapFrom(src => src.InscripcionesCarreras.FirstOrDefault().Carrera.Id));
-
+                                           .ForMember(dest => dest.CarreraId, opt => opt.MapFrom(src => src.InscripcionesCarreras.FirstOrDefault().Carrera.Id))
+                                           .ForMember(dest => dest.NameCarrera, opt => opt.MapFrom(src => src.InscripcionesCarreras.FirstOrDefault().Carrera.Nombre));
             //_usuario________________________________________________________________________________________________________________________________
             CreateMap<CrearUsuarioDTO, Usuario>();
             CreateMap<Usuario, GetUsuarioDTO>()

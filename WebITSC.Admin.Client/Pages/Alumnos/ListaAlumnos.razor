@@ -1,101 +1,151 @@
-﻿@page "/Alumnos"
-@inject IHttpServicios http
+﻿@page "/lista-alumnos"
+@using WebITSC.Shared.General.DTO.Alumnos
+@using WebITSC.Shared.General.DTO.BuscarAlumnosDTOs
+@using WebITSC.Shared.General.DTO.Carreraa
+@inject HttpClient http
+@inject NavigationManager Navigation
 
-<PageTitle>Alumnos</PageTitle>
+<h3>Lista de Alumnos</h3>
 
-<h1>Alumnos</h1>
-
-<p>BUSCAR ALUMNOS</p>
-
-<div>
-    <input @bind="nombre" placeholder="Nombre" />
-    <input @bind="apellido" placeholder="Apellido" />
-    <input @bind="documento" placeholder="Documento" />
-    <input @bind="cohorte" placeholder="Cohorte" />
-    <button @onclick="BuscarAlumnos">Buscar</button>
+<!-- Filtros de búsqueda -->
+<div class="form-group">
+    <label for="search">Buscar</label>
+    <InputText class="form-control" id="search" @bind-Value="searchTerm" placeholder="Buscar por nombre, apellido, documento, etc..." />
 </div>
 
+<div class="form-group">
+    <label for="carreraFilter">Filtrar por Carrera</label>
+    <InputSelect class="form-control" id="carreraFilter" @bind-Value="selectedCarrera">
+        <option value="">Seleccione una carrera</option>
+        @foreach (var carrera in availableCarreras)
+        {
+            <option value="@carrera.Id">@carrera.Nombre</option>
+        }
+    </InputSelect>
+</div>
 
-<table>
-    @if (Mensaje == "")
-    {
-        @if (alumnos == null)
+<div class="form-group">
+    <label for="cohorteFilter">Filtrar por Cohorte</label>
+    <InputNumber class="form-control" id="cohorteFilter" @bind-Value="selectedCohorte" />
+</div>
+
+<!-- Tabla de Alumnos -->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Carrera</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Documento</th>
+            <th>Cohorte</th>
+            <th>CUIL</th>
+            <th>País</th>
+            <th>Provincia</th>
+            <th>Departamento</th>
+            <th>Título Base</th>
+            <th>Fotocopia DNI</th>
+            <th>Constancia CUIL</th>
+            <th>Partida de Nacimiento</th>
+            <th>Analítico</th>
+            <th>Foto Carnet</th>
+            <th>CUS</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var alumno in FilteredAlumnos)
         {
-            <p>Buscando....</p>
+            <tr>
+                <td>@alumno.InscripcionesEnCarreras.FirstOrDefault()?.NombreCarrera</td>
+                <td>@alumno.Nombre</td>
+                <td>@alumno.Apellido</td>
+                <td>@alumno.Documento</td>
+                <td>@(alumno.InscripcionesEnCarreras.FirstOrDefault()?.Cohorte.ToString() ?? "Sin cohorte")</td>
+                <td>@alumno.Cuil</td>
+                <td>@alumno.Pais</td>
+                <td>@alumno.Provincia</td>
+                <td>@alumno.Departamento</td>
+                <td>@alumno.TituloBase</td>
+                <td>@alumno.FotocopiaDNI</td>
+                <td>@alumno.ConstanciaCUIL</td>
+                <td>@alumno.PartidaNacimiento</td>
+                <td>@alumno.Analitico</td>
+                <td>@alumno.FotoCarnet</td>
+                <td>@alumno.Cus</td>
+                <td>@(alumno.EstadoAlumno ? "Activo" : "Inactivo")</td>
+            </tr>
         }
-        else if (alumnos.Count == 0)
-        {
-            <p>No existen tipos de documentos</p>
-        }
-        else
-        {
-            @foreach (var alumno in alumnos)
-            {
-                <tr>
-                    <td>@alumno.Usuario.Persona?.Nombre</td>
-                    <td>@alumno.Usuario.Persona?.Apellido</td>
-                    <td>@alumno.Usuario.Persona?.Documento</td>
-                    <td>@alumno.InscripcionesCarreras.FirstOrDefault()?.Cohorte</td>
-                </tr>
-            }
-        }
-    }
-    else
-    {
-        <p> Error: @Mensaje</p>
-    }
+    </tbody>
 </table>
 
-
-
 @code {
-    string nombre;
-    string apellido;
-    string documento;
-    int? cohorte  ;
-    string Mensaje = string.Empty ;
-    List<Alumno>? alumnos = new List<Alumno>();
-    Alumno alumno = new Alumno();
-    
+    private List<BuscarAlumnoDTO> alumnos = new List<BuscarAlumnoDTO>();
+    private List<GetCarreraDTO> availableCarreras = new List<GetCarreraDTO>(); // Carreras obtenidas del backend
+    private string selectedCarrera = string.Empty;  // Carrera seleccionada
+    private int? selectedCohorte = null;  // Cohorte seleccionado
+    private string searchTerm = string.Empty;
 
-    protected override async Task OnInitializedAsync()
+    // Propiedad calculada para obtener los alumnos filtrados
+    private IEnumerable<BuscarAlumnoDTO> FilteredAlumnos
     {
-        await base.OnInitializedAsync();
-        await BuscarAlumnos();
+        get
+        {
+            var filtered = alumnos.AsEnumerable();
+
+            // Filtrar por el término de búsqueda
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                filtered = filtered.Where(a =>
+                    a.Nombre.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    a.Apellido.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    a.Documento.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+            }
+
+            // Filtrar por Carrera seleccionada
+            if (!string.IsNullOrWhiteSpace(selectedCarrera))
+            {
+                filtered = filtered.Where(a => a.InscripcionesEnCarreras
+                    .Any(ic => ic.NombreCarrera.Contains(selectedCarrera, StringComparison.OrdinalIgnoreCase)));
+            }
+
+            // Filtrar por Cohorte seleccionado
+            if (selectedCohorte.HasValue)
+            {
+                filtered = filtered.Where(a => a.InscripcionesEnCarreras
+                    .Any(ic => ic.Cohorte == selectedCohorte.Value));
+            }
+
+            return filtered;
+        }
     }
 
-
-    private async Task BuscarAlumnos()
+    // Este método se ejecuta al cargar la página
+    protected override async Task OnInitializedAsync()
     {
-        // Construir la URL de consulta con los parámetros
-        var queryParams = new Dictionary<string, string>();
-        if (!string.IsNullOrEmpty(nombre)) queryParams.Add("nombre", nombre);
-        if (!string.IsNullOrEmpty(apellido)) queryParams.Add("apellido", apellido);
-        if (!string.IsNullOrEmpty(documento)) queryParams.Add("documento", documento);
-        if (cohorte.HasValue) queryParams.Add("cohorte", cohorte.Value.ToString());
-
-        // Verificar si todos los campos están vacíos
-        if (!queryParams.Any())
+        try
         {
-            Mensaje = "Debe completar al menos un campo de búsqueda.";
-            return;
+            // Obtener la lista de alumnos del API
+            alumnos = await http.GetFromJsonAsync<List<BuscarAlumnoDTO>>("api/alumnos/buscar");
+
+            // Obtener las carreras disponibles del API
+            availableCarreras = await http.GetFromJsonAsync<List<GetCarreraDTO>>("api/carreras");
+
+            // Si no obtenemos datos, asignamos una lista vacía
+            if (alumnos == null)
+            {
+                alumnos = new List<BuscarAlumnoDTO>();
+            }
+            if (availableCarreras == null)
+            {
+                availableCarreras = new List<GetCarreraDTO>();
+            }
         }
-
-        var queryString = string.Join("&", queryParams.Select(x => $"{x.Key}={x.Value}"));
-        var url = $"/api/Alumnos/buscar?{queryString}";
-
-        var resp = await http.Get<List<Alumno>>(url);
-        if (!resp.Error)
+        catch (Exception ex)
         {
-            alumnos = resp.Respuesta;
-        }
-        else
-        {
-            Mensaje = await resp.ObtenerError();
+            Console.WriteLine($"Error al obtener los alumnos o carreras: {ex.Message}");
         }
     }
 }
-
 
 
 

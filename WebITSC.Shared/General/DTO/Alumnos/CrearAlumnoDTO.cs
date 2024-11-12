@@ -91,6 +91,10 @@ namespace WebITSC.Shared.General.DTO.Alumnos
 
             [MaxLength(40, ErrorMessage = "Máximo número de caracteres {100}.")]
             public string? CUS { get; set; }
+
+            //public string Cohorte { get; set; } /*= DateTime.Now.Year.ToString();*/
+
+
     }
 }
 
