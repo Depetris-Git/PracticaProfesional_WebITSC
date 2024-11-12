@@ -25,7 +25,13 @@ namespace WebITSC.Admin.Client.Servicios
             }
         }
 
-        public async Task<HttpRespuesta<object>> Post<O>(string url, O entidad)  // "O" lo que se envia, "object" lo que recibo.
+		public async Task<HttpRespuesta<object>> GetNotasByTurno(string url)
+		{
+			var respuesta = await http.GetAsync(url);
+			return new HttpRespuesta<object>(null, !respuesta.IsSuccessStatusCode, respuesta);
+		}
+
+		public async Task<HttpRespuesta<object>> Post<O>(string url, O entidad)  // "O" lo que se envia, "object" lo que recibo.
         {
             var EntSerializada = JsonSerializer.Serialize(entidad);
             var EnviarJSON = new StringContent(EntSerializada, Encoding.UTF8, "application/json");
