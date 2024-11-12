@@ -4,6 +4,8 @@ using WebITSC.Admin.Server.Repositorio;
 using WebITSC.DB.Data.Entity;
 using Microsoft.AspNetCore.Mvc;
 using WebITSC.Shared.General.DTO;
+using Repositorio.General;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebITSC.Admin.Server.Controllers
 {
@@ -13,10 +15,10 @@ namespace WebITSC.Admin.Server.Controllers
         [Route("api/CertificadoAlumnos")]
         public class CertificadoAlumnosController : ControllerBase
         {
-            private readonly IRepositorio<CertificadoAlumno> repositorio;
+            private readonly ICertificadoAlumnoRepositorio repositorio;
             private readonly IMapper mapper;
 
-            public CertificadoAlumnosController(IRepositorio<CertificadoAlumno> repositorio,
+            public CertificadoAlumnosController(ICertificadoAlumnoRepositorio repositorio,
                                       IMapper mapper)
             {
 
@@ -43,7 +45,7 @@ namespace WebITSC.Admin.Server.Controllers
                 return sel;
             }
 
-            [HttpGet("existe/{id:int}")]
+            [HttpGet("existe/")]
             public async Task<ActionResult<bool>> Existe(int id)
             {
                 var existe = await repositorio.Existe(id);
@@ -52,6 +54,51 @@ namespace WebITSC.Admin.Server.Controllers
             }
 
             #endregion
+
+
+            //[HttpGet("test")]
+            //public async Task<ActionResult<GetDatosCertificadosDTO>> GenerarCertificado(
+            //                                                        [FromQuery] string? nombre,
+            //                                                        [FromQuery] string? apellido,
+            //                                                        [FromQuery] string? documento)
+            //{
+            //    var alumno = await repositorio.SelectDatosCertificado(nombre, apellido, documento);
+
+            //    if (alumno == null)
+            //    {
+            //        return NotFound("No se encontro alumno.");
+            //    }
+
+            //    var pdfData = repositorio.GenerarCertificadoPDF(alumno.Value);
+
+            //    return File(pdfData, "application/pdf", "Certificado.pdf");
+
+            //    /*return Ok(alumno.Value)*/
+
+            //}
+            //Get de Prueba_______________________________________________________________________________
+
+            [HttpGet("test")]
+            public async Task<ActionResult> GenerarCertificado(
+                                                            [FromQuery] string? nombre,
+                                                            [FromQuery] string? apellido,
+                                                            [FromQuery] string? documento)
+            {
+                var alumno = await repositorio.SelectDatosCertificado(nombre, apellido, documento);
+
+                if (alumno == null)
+                {
+                    return NotFound("No se encontro alumno.");
+                }
+
+                var pdfData = repositorio.GenerarCertificadoPDF(alumno.Value);
+
+                return File(pdfData, "application/pdf", "Certificado.pdf");
+
+                /*return Ok(alumno.Value)*/
+                
+            }
+            //____________________________________________________________________________________________
 
             [HttpPost]
             public async Task<ActionResult<int>> Post(CrearCertificadoAlumnoDTO entidadDTO)

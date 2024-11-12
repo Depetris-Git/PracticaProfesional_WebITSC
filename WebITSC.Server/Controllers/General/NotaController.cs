@@ -22,6 +22,7 @@ namespace WebITSC.Server.Controllers.General
             this.mapper = mapper;
         }
 
+        #region Peticiones Get
         [HttpGet]
         public async Task<ActionResult<List<Nota>>> GetAll()
         {
@@ -38,33 +39,9 @@ namespace WebITSC.Server.Controllers.General
 
             return Ok(nota);
         }
-        #region Peticiones Get
+        
 
-        //[HttpGet]
-        //public async Task<ActionResult<List<Nota>>> Get()
-        //{
-        //    return await repositorio.Select();
-        //}
-
-        //[HttpGet("{id:int}")]
-        //public async Task<ActionResult<Nota>> Get(int id)
-        //{
-        //    Nota? sel = await repositorio.SelectById(id);
-        //    if (sel == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return sel;
-        //}
-
-        //[HttpGet("existe/{id:int}")]
-        //public async Task<ActionResult<bool>> Existe(int id)
-        //{
-        //    var existe = await repositorio.Existe(id);
-        //    return existe;
-
-        //}
-
+        
         [HttpGet("GetNotasByTurno/{turnoId}")]
         public async Task<ActionResult<List<GetNotaNBTDTO>>> GetNotasByTurno(int turnoId)
         {

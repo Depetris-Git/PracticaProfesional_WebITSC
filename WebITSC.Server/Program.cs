@@ -82,7 +82,7 @@ builder.Services.AddScoped<IRepositorio<Persona>, Repositorio<Persona>>();
 builder.Services.AddScoped<IPlanEstudioRepositorio, PlanEstudioRepositorio>();
 builder.Services.AddScoped<IRepositorio<Profesor>, Repositorio<Profesor>>();
 builder.Services.AddScoped<ITurnoRepositorio, TurnoRepositorio>();
-
+builder.Services.AddScoped<ICertificadoAlumnoRepositorio, CertificadoAlumnoRepositorio>();
 builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 builder.Services.AddScoped<IPersonaRepositorio, PersonaRepositorio>();
 builder.Services.AddScoped<ICarreraRepositorio, CarreraRepositorio>();
