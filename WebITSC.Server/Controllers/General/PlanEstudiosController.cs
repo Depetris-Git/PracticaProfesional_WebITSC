@@ -13,13 +13,19 @@ namespace WebITSC.Admin.Server.Controllers
         public class PlanEstudiosController : ControllerBase
         {
             private readonly IPlanEstudioRepositorio eRepositorio;
+            private readonly IMateriaEnPlanEstudioRepositorio materiaEnPlanRepositorio;
+            private readonly IRepositorio<Materia> mRepositorio;
             private readonly IMapper mapper;
 
             public PlanEstudiosController(IPlanEstudioRepositorio eRepositorio,
+                                          IMateriaEnPlanEstudioRepositorio materiaEnPlanRepositorio,
+                                          IRepositorio<Materia> mRepositorio,
                                           IMapper mapper)
             {
 
                 this.eRepositorio = eRepositorio;
+                this.materiaEnPlanRepositorio = materiaEnPlanRepositorio;
+                this.mRepositorio = mRepositorio;
                 this.mapper = mapper;
             }
 

@@ -196,6 +196,9 @@ namespace WebITSC.DB.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex(new[] { "Nombre" }, "Carrera_UQ")
+                        .IsUnique();
+
                     b.ToTable("Carreras");
                 });
 

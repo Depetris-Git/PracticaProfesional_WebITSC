@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -9,7 +10,6 @@ namespace WebITSC.DB.Data.Entity
 {
     public class Carrera : EntityBase
     {
-
         [Required(ErrorMessage = "El nombre de la carrera es necesario")]
         [MaxLength(40, ErrorMessage = "Máximo número de caracteres {1}.")]
         public string Nombre { get; set; }

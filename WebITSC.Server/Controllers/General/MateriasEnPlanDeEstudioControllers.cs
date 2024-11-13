@@ -13,19 +13,29 @@ namespace WebITSC.Server.Controllers.General
     public class MateriaEnPlanEstudioController : ControllerBase
     {
         private readonly IMateriaEnPlanEstudioRepositorio eRepositorio;
+        private readonly IPlanEstudioRepositorio planEstudioRepositorio;
         private readonly IMapper mapper;
 
         public MateriaEnPlanEstudioController(IMateriaEnPlanEstudioRepositorio eRepositorio,
+                                              IPlanEstudioRepositorio planEstudioRepositorio,
                                               IMapper mapper)
         {
 
             this.eRepositorio = eRepositorio;
+            this.planEstudioRepositorio = planEstudioRepositorio;
             this.mapper = mapper;
         }
         [HttpGet]
         public async Task<ActionResult<List<MateriaEnPlanEstudio>>> GetAll()
         {
             var MateriasEnPlanDeEstudio = await eRepositorio.FullGetAll();
+
+            return Ok(MateriasEnPlanDeEstudio);
+        }
+
+        public async Task<ActionResult<List<MateriaEnPlanEstudio>>> GetByPlan(int planEstudioId)
+        {
+            var MateriasEnPlanDeEstudio = await eRepositorio.FullGetByPlanEstudio(planEstudioId);
 
             return Ok(MateriasEnPlanDeEstudio);
         }
