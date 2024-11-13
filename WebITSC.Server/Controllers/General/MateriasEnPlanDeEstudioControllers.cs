@@ -5,6 +5,7 @@ using WebITSC.DB.Data;
 using WebITSC.DB.Data.Entity;
 using Microsoft.AspNetCore.Mvc;
 using WebITSC.Shared.General.DTO;
+using Repositorio.General;
 
 namespace WebITSC.Server.Controllers.General
 {
@@ -14,15 +15,18 @@ namespace WebITSC.Server.Controllers.General
     {
         private readonly IMateriaEnPlanEstudioRepositorio eRepositorio;
         private readonly IPlanEstudioRepositorio planEstudioRepositorio;
+        private readonly ICarreraRepositorio carreraRepositorio;
         private readonly IMapper mapper;
 
         public MateriaEnPlanEstudioController(IMateriaEnPlanEstudioRepositorio eRepositorio,
                                               IPlanEstudioRepositorio planEstudioRepositorio,
+                                              ICarreraRepositorio carreraRepositorio,
                                               IMapper mapper)
         {
 
             this.eRepositorio = eRepositorio;
             this.planEstudioRepositorio = planEstudioRepositorio;
+            this.carreraRepositorio = carreraRepositorio;
             this.mapper = mapper;
         }
         [HttpGet]
@@ -143,7 +147,36 @@ namespace WebITSC.Server.Controllers.General
 
         }
 
-
+        [HttpGet("GetId")]
+        public async Task<ActionResult<List<MateriaEnPlanEstudio>>> GetByCarreraAndAnno([FromBody] GetByCarreraAnnoPlanEstudioDTO entidadDTO)
+        {
+            if (entidadDTO != null)
+            {
+                var a = await carreraRepositorio.GetByNombre(entidadDTO.NombreCarrera);
+                var b = await planEstudioRepositorio.GetIdByCarreraAnno(a, entidadDTO.Anno);
+                if (b != 0)
+                {
+                    var resultado = await eRepositorio.FullGetByPlanEstudio(b);
+                    
+                    if(resultado != null)
+                    {
+                        return Ok(resultado);
+                    }
+                    else
+                    {
+                        return NotFound($"No se encontraron Materias en el Plan de Estudio del año {entidadDTO.Anno}");
+                    }
+                }
+                else
+                {
+                    return NotFound("No se encontró un Plan de Estudio");
+                }
+            }
+            else
+            {
+                return NotFound("No se encontró un Plan de Estudio");
+            }
+        }
 
     }
 

@@ -121,60 +121,67 @@ namespace Repositorio.General
 								.SetBold()
 								.SetTextAlignment(TextAlignment.CENTER));
 
-				// Datos del alumno
-				document.Add(new Paragraph($"Nombre: {datos.ApellidoyNombre}")
-								.SetFontSize(12)
-								.SetTextAlignment(TextAlignment.LEFT));
-				document.Add(new Paragraph($"Tipo de Documento: {datos.TipoDocumentoCertificado}")
-								.SetFontSize(12));
-				document.Add(new Paragraph($"Nro Documento: {datos.NroDocumento}")
-								.SetFontSize(12));
-				document.Add(new Paragraph($"Fecha de Nacimiento: {datos.FechadeNacimiento}")
-								.SetFontSize(12));
-				document.Add(new Paragraph($"Lugar de Nacimiento: {datos.LugarNacimiento}")
-								.SetFontSize(12));
-				document.Add(new Paragraph($"Teléfono: {datos.NroTelefono}")
-								.SetFontSize(12));
-				document.Add(new Paragraph($"Título Habilitante: {datos.TituloHabilitante}")
-								.SetFontSize(12));
-				document.Add(new Paragraph($"Legajo: {datos.Legajo}")
-								.SetFontSize(12));
-				document.Add(new Paragraph($"Libro Matriz: {datos.LibroMatriz}")
-								.SetFontSize(12));
-				document.Add(new Paragraph($"Fecha de Emisión: {datos.Fecha}")
-								.SetFontSize(12));
+                // Datos del alumno
+                if (datos != null)
+                {
+                    document.Add(new Paragraph($"Nombre: {datos.ApellidoyNombre}")
+                                    .SetFontSize(12)
+                                    .SetTextAlignment(TextAlignment.LEFT));
+                    document.Add(new Paragraph($"Tipo de Documento: {datos.TipoDocumentoCertificado}")
+                                    .SetFontSize(12));
+                    document.Add(new Paragraph($"Nro Documento: {datos.NroDocumento}")
+                                    .SetFontSize(12));
+                    document.Add(new Paragraph($"Fecha de Nacimiento: {datos.FechadeNacimiento}")
+                                    .SetFontSize(12));
+                    document.Add(new Paragraph($"Lugar de Nacimiento: {datos.LugarNacimiento}")
+                                    .SetFontSize(12));
+                    document.Add(new Paragraph($"Teléfono: {datos.NroTelefono}")
+                                    .SetFontSize(12));
+                    document.Add(new Paragraph($"Título Habilitante: {datos.TituloHabilitante}")
+                                    .SetFontSize(12));
+                    document.Add(new Paragraph($"Legajo: {datos.Legajo}")
+                                    .SetFontSize(12));
+                    document.Add(new Paragraph($"Libro Matriz: {datos.LibroMatriz}")
+                                    .SetFontSize(12));
+                    document.Add(new Paragraph($"Fecha de Emisión: {datos.Fecha}")
+                                    .SetFontSize(12));
 
-				// Agregar espacio antes de la tabla
-				document.Add(new Paragraph(" "));
+                    // Agregar espacio antes de la tabla
+                    document.Add(new Paragraph(" "));
 
-				// Tabla de materias
-				iText.Layout.Element.Table table = new iText.Layout.Element.Table(8).UseAllAvailableWidth(); // 8 columnas para la tabla de materias
-				table.AddHeaderCell(new Cell().Add(new Paragraph("Asignatura").SetBold()));
-				table.AddHeaderCell(new Cell().Add(new Paragraph("Valor Nota").SetBold()));
-				table.AddHeaderCell(new Cell().Add(new Paragraph("Nota Letra").SetBold()));
-				table.AddHeaderCell(new Cell().Add(new Paragraph("Libro").SetBold()));
-				table.AddHeaderCell(new Cell().Add(new Paragraph("Folio").SetBold()));
-				table.AddHeaderCell(new Cell().Add(new Paragraph("Fecha").SetBold()));
-				table.AddHeaderCell(new Cell().Add(new Paragraph("Condición Actual").SetBold()));
-				table.AddHeaderCell(new Cell().Add(new Paragraph("Sede").SetBold()));
+                    // Tabla de materias
+                    iText.Layout.Element.Table table = new iText.Layout.Element.Table(8).UseAllAvailableWidth(); // 8 columnas para la tabla de materias
+                    table.AddHeaderCell(new Cell().Add(new Paragraph("Asignatura").SetBold()));
+                    table.AddHeaderCell(new Cell().Add(new Paragraph("Valor Nota").SetBold()));
+                    table.AddHeaderCell(new Cell().Add(new Paragraph("Nota Letra").SetBold()));
+                    table.AddHeaderCell(new Cell().Add(new Paragraph("Libro").SetBold()));
+                    table.AddHeaderCell(new Cell().Add(new Paragraph("Folio").SetBold()));
+                    table.AddHeaderCell(new Cell().Add(new Paragraph("Fecha").SetBold()));
+                    table.AddHeaderCell(new Cell().Add(new Paragraph("Condición Actual").SetBold()));
+                    table.AddHeaderCell(new Cell().Add(new Paragraph("Sede").SetBold()));
 
-				// Filas de la tabla
-				foreach (var fila in datos.FilasTabla)
-				{
-					table.AddCell(new Cell().Add(new Paragraph(fila.Asignatura)));
-					table.AddCell(new Cell().Add(new Paragraph(fila.ValorNota.ToString())));
-					table.AddCell(new Cell().Add(new Paragraph(fila.NotaLetra)));
-					table.AddCell(new Cell().Add(new Paragraph(fila.Libro)));
-					table.AddCell(new Cell().Add(new Paragraph(fila.Folio)));
-					table.AddCell(new Cell().Add(new Paragraph($"{fila.Dia}/{fila.Mes}/{fila.Anno}")));
-					table.AddCell(new Cell().Add(new Paragraph(fila.CondicionActual)));
-					table.AddCell(new Cell().Add(new Paragraph(fila.Sede)));
-				}
+                    // Filas de la tabla
+                    foreach (var fila in datos.FilasTabla)
+                    {
+                        table.AddCell(new Cell().Add(new Paragraph(fila.Asignatura)));
+                        table.AddCell(new Cell().Add(new Paragraph(fila.ValorNota.ToString())));
+                        table.AddCell(new Cell().Add(new Paragraph(fila.NotaLetra)));
+                        table.AddCell(new Cell().Add(new Paragraph(fila.Libro)));
+                        table.AddCell(new Cell().Add(new Paragraph(fila.Folio)));
+                        table.AddCell(new Cell().Add(new Paragraph($"{fila.Dia}/{fila.Mes}/{fila.Anno}")));
+                        table.AddCell(new Cell().Add(new Paragraph(fila.CondicionActual)));
+                        table.AddCell(new Cell().Add(new Paragraph(fila.Sede)));
+                    }
 
-				document.Add(table);
+                    document.Add(table);
 
-				document.Close();
-				return stream.ToArray();
+                    document.Close();
+                    return stream.ToArray();
+                }
+                else
+                {
+                    return Array.Empty<byte>();
+                }
 			}
 		}
 

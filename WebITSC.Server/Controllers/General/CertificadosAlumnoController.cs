@@ -7,6 +7,7 @@ using WebITSC.Shared.General.DTO;
 using Repositorio.General;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.ComponentModel.DataAnnotations;
+using iText.Kernel.Pdf;
 
 namespace WebITSC.Admin.Server.Controllers
 {
@@ -66,20 +67,26 @@ namespace WebITSC.Admin.Server.Controllers
                 {
                     return NotFound("No se encontro alumno.");
                 }
-                
-                var pdfData = repositorio.GenerarCertificadoPDF(alumno.Value);
-
-                if (pdfData.Any())
+                if (alumno.Value != null)
                 {
-                    var EntidadAlumno = await repositorio.SelectAlumnoByDoc(alumno.Value.NroDocumento);
-                    var entidadDTO = new CrearCertificadoAlumnoDTO(EntidadAlumno.Value, DateTime.Now);
-                    var entidad = mapper.Map<CertificadoAlumno>(entidadDTO);
+                    var pdfData = repositorio.GenerarCertificadoPDF(alumno.Value);
 
-                    await repositorio.Insert(entidad);
+                    if (pdfData.Any())
+                    {
+                        var EntidadAlumno = await repositorio.SelectAlumnoByDoc(alumno.Value.NroDocumento);
+                        var entidadDTO = new CrearCertificadoAlumnoDTO(EntidadAlumno.Value, DateTime.Now);
+                        var entidad = mapper.Map<CertificadoAlumno>(entidadDTO);
+
+                        await repositorio.Insert(entidad);
+                    }
+
+                    return File(pdfData, "application/pdf", "Certificado.pdf");
                 }
-
-                return File(pdfData, "application/pdf", "Certificado.pdf");
-
+                else
+                {
+                    return NotFound("No se encotró alumno.");
+                }
+                
             }
             
 

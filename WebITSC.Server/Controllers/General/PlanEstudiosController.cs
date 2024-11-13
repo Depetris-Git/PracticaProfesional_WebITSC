@@ -4,6 +4,7 @@ using WebITSC.Admin.Server.Repositorio;
 using WebITSC.DB.Data.Entity;
 using Microsoft.AspNetCore.Mvc;
 using WebITSC.Shared.General.DTO;
+using Repositorio.General;
 namespace WebITSC.Admin.Server.Controllers
 {
     namespace WebITSC.Admin.Server.Controllers
@@ -14,17 +15,20 @@ namespace WebITSC.Admin.Server.Controllers
         {
             private readonly IPlanEstudioRepositorio eRepositorio;
             private readonly IMateriaEnPlanEstudioRepositorio materiaEnPlanRepositorio;
+            private readonly ICarreraRepositorio carreraRepositorio;
             private readonly IRepositorio<Materia> mRepositorio;
             private readonly IMapper mapper;
 
             public PlanEstudiosController(IPlanEstudioRepositorio eRepositorio,
                                           IMateriaEnPlanEstudioRepositorio materiaEnPlanRepositorio,
+                                          ICarreraRepositorio carreraRepositorio,
                                           IRepositorio<Materia> mRepositorio,
                                           IMapper mapper)
             {
 
                 this.eRepositorio = eRepositorio;
                 this.materiaEnPlanRepositorio = materiaEnPlanRepositorio;
+                this.carreraRepositorio = carreraRepositorio;
                 this.mRepositorio = mRepositorio;
                 this.mapper = mapper;
             }
@@ -138,10 +142,7 @@ namespace WebITSC.Admin.Server.Controllers
                     return BadRequest();
                 }
 
-            }
-
-
-
+            }  
         }
 
     }

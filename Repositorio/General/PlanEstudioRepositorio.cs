@@ -1,6 +1,7 @@
 ﻿using WebITSC.DB.Data;
 using WebITSC.DB.Data.Entity;
 using Microsoft.EntityFrameworkCore;
+using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace WebITSC.Admin.Server.Repositorio
 {
@@ -25,5 +26,39 @@ namespace WebITSC.Admin.Server.Repositorio
                 .ToListAsync();
         }
 
+        public async Task<int> GetIdByCarreraAnno(int carreraId, int anno)
+        {
+            var a = await context.PlanesEstudio
+                .Include(u => u.Carrera)
+                .Where(u => u.CarreraId == carreraId && u.Anno == anno)
+                .FirstOrDefaultAsync();
+
+            if (a != null)
+            {
+                return a.Id;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        public async Task<PlanEstudio> GetByCarreraAnno(int carreraId, int anno)
+        {
+
+            try
+            {
+                return await context.PlanesEstudio
+                        .Include(u => u.Carrera)
+                        .Where(u => u.CarreraId == carreraId && u.Anno == anno)
+                        .FirstOrDefaultAsync();
+            }
+
+            catch (Exception err)
+            {
+                throw err;
+            }
+
+        }
     }
 }

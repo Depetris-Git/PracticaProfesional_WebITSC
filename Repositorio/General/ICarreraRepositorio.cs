@@ -5,6 +5,7 @@ namespace Repositorio.General
 {
     public interface ICarreraRepositorio: IRepositorio<Carrera>
     {
+        Task<int> GetByNombre(string nombreCarrera);
         Task<Carrera> GetCarreraByIdAsync(int carreraId);
     }
 }

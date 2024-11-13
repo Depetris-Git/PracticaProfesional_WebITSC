@@ -23,5 +23,18 @@ namespace Repositorio.General
         {
             return await context.Set<Carrera>().FindAsync(carreraId);
         }
+
+        public async Task<int> GetByNombre(string nombreCarrera)
+        {
+            var a = await context.Set<Carrera>().FindAsync(nombreCarrera);
+            if (a != null)
+            {
+                return a.Id;
+            }
+            else
+            {
+                return 0;
+            }
+        }
     }
 }

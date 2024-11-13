@@ -23,8 +23,8 @@ namespace WebITSC.Admin.Server.Repositorio
         public async Task<List<MateriaEnPlanEstudio>> FullGetByPlanEstudio(int planEstudioId)
         {
             return await context.MateriasEnPlanEstudio
-                .Include(p => p.Materia)
-                .Include(p => p.PlanEstudio)
+                .Include(p => p.Materia.Nombre)
+                .Include(p => p.PlanEstudio.Anno)
                 .Where(p => p.PlanEstudioId == planEstudioId)
                 .ToListAsync();
         }

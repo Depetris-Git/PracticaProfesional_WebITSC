@@ -25,4 +25,10 @@ namespace WebITSC.Shared.General.DTO
 
         public List<MateriaEnPlanEstudio> MateriasEnPlanEstudio = new List<MateriaEnPlanEstudio>();
     }
+    
+    public class GetByCarreraAnnoPlanEstudioDTO
+    {
+        public string NombreCarrera { get; set; }
+        public int Anno { get; set; } //Año natural de Plan de Estudio
+    }
 }
