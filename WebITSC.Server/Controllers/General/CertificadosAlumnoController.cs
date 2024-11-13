@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebITSC.Shared.General.DTO;
 using Repositorio.General;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebITSC.Admin.Server.Controllers
 {
@@ -55,65 +56,34 @@ namespace WebITSC.Admin.Server.Controllers
 
             #endregion
 
-
-            //[HttpGet("test")]
-            //public async Task<ActionResult<GetDatosCertificadosDTO>> GenerarCertificado(
-            //                                                        [FromQuery] string? nombre,
-            //                                                        [FromQuery] string? apellido,
-            //                                                        [FromQuery] string? documento)
-            //{
-            //    var alumno = await repositorio.SelectDatosCertificado(nombre, apellido, documento);
-
-            //    if (alumno == null)
-            //    {
-            //        return NotFound("No se encontro alumno.");
-            //    }
-
-            //    var pdfData = repositorio.GenerarCertificadoPDF(alumno.Value);
-
-            //    return File(pdfData, "application/pdf", "Certificado.pdf");
-
-            //    /*return Ok(alumno.Value)*/
-
-            //}
-            //Get de Prueba_______________________________________________________________________________
-
-            [HttpGet("test")]
-            public async Task<ActionResult> GenerarCertificado(
-                                                            [FromQuery] string? nombre,
-                                                            [FromQuery] string? apellido,
-                                                            [FromQuery] string? documento)
+            //A pesar de lo que parezca, funciona como un POST
+            [HttpGet("generarCertificado")]
+            public async Task<ActionResult> GenerarCertificado([Required] string documento)
             {
-                var alumno = await repositorio.SelectDatosCertificado(nombre, apellido, documento);
+                var alumno = await repositorio.SelectDatosCertificado(documento);
 
                 if (alumno == null)
                 {
                     return NotFound("No se encontro alumno.");
                 }
-
+                
                 var pdfData = repositorio.GenerarCertificadoPDF(alumno.Value);
+
+                if (pdfData.Any())
+                {
+                    var EntidadAlumno = await repositorio.SelectAlumnoByDoc(alumno.Value.NroDocumento);
+                    var entidadDTO = new CrearCertificadoAlumnoDTO(EntidadAlumno.Value, DateTime.Now);
+                    var entidad = mapper.Map<CertificadoAlumno>(entidadDTO);
+
+                    await repositorio.Insert(entidad);
+                }
 
                 return File(pdfData, "application/pdf", "Certificado.pdf");
 
-                /*return Ok(alumno.Value)*/
-                
             }
-            //____________________________________________________________________________________________
+            
 
-            [HttpPost]
-            public async Task<ActionResult<int>> Post(CrearCertificadoAlumnoDTO entidadDTO)
-            {
-                try
-                {
-                    CertificadoAlumno entidad = mapper.Map<CertificadoAlumno>(entidadDTO);
-
-                    return await repositorio.Insert(entidad);
-                }
-                catch (Exception e)
-                {
-                    return BadRequest(e.Message);
-                }
-            }
+           
 
             [HttpPut("{id:int}")]
             public async Task<ActionResult> Put(int id, [FromBody] CertificadoAlumno entidad)

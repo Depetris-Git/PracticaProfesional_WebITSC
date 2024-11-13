@@ -8,6 +8,7 @@ namespace Repositorio.General
     public interface ICertificadoAlumnoRepositorio: IRepositorio<CertificadoAlumno>
     {
         byte[] GenerarCertificadoPDF(GetDatosCertificadosDTO datos);
-        Task<ActionResult<GetDatosCertificadosDTO>> SelectDatosCertificado(string? nombre, string? apellido, string? documento);
+        Task<ActionResult<Alumno>> SelectAlumnoByDoc(string documento);
+        Task<ActionResult<GetDatosCertificadosDTO>> SelectDatosCertificado(string documento);
     }
 }

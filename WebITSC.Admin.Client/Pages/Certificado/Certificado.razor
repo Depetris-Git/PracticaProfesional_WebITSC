@@ -5,41 +5,58 @@
 <h3>Generar Certificado</h3>
 
 <form>
-    <label>Nombre:</label>
-    <input type="text" @bind="nombre" />
+    <p> <label>Ingrese el documento del alumno:</label> </p>
+    <p> <input type="text" @bind="documento"/> </p>
 
-    <label>Apellido:</label>
-    <input type="text" @bind="apellido" />
-
-    <label>Documento:</label>
-    <input type="text" @bind="documento" />
+    
+    <!-- Label de error para campo vacío -->
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <p> <label style="color: red;">@errorMessage</label> </p>
+    }
 
     <button type="button" @onclick="OnGenerateCertificado">Generar PDF</button>
 </form>
 
 @code {
-    private string nombre;
-    private string apellido;
     private string documento;
+    private string errorMessage;
 
     private async Task OnGenerateCertificado()
     {
-        var url = $"https://localhost:7118/api/CertificadoAlumnos/test?nombre={nombre}&apellido={apellido}&documento={documento}";
 
-        var response = await Http.GetAsync(url);
-
-        if (response.IsSuccessStatusCode)
+        if (!string.IsNullOrWhiteSpace(documento))
         {
-            var pdfData = await response.Content.ReadAsByteArrayAsync();
-            var base64Data = Convert.ToBase64String(pdfData);
+            errorMessage = null;
+            var url = $"https://localhost:7118/api/CertificadoAlumnos/generarCertificado?documento={documento}";
 
-            // Llamada a JavaScript para descargar el archivo PDF
-            await JS.InvokeVoidAsync("downloadFileFromBase64", base64Data, "Certificado.pdf");
+            var response = await Http.GetAsync(url);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var pdfData = await response.Content.ReadAsByteArrayAsync();
+                var base64Data = Convert.ToBase64String(pdfData);
+
+                // Llamada a JavaScript para descargar el archivo PDF
+                await JS.InvokeVoidAsync("downloadFileFromBase64", base64Data, "Certificado.pdf");
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                errorMessage = "Documento no encontrado en la base de datos.";
+            }
+            else
+            {
+                errorMessage = "Documento no encontrado en la base de datos.";
+            }
+            
         }
         else
         {
-            Console.WriteLine("Error al generar el PDF.");
+            // Establece el mensaje de error si el campo está vacío
+            errorMessage = "Ingrese un documento válido.";
         }
+
+        
     }
 }
 

@@ -10,6 +10,13 @@ namespace WebITSC.Shared.General.DTO
 {
     public class CrearCertificadoAlumnoDTO
     {
+        public CrearCertificadoAlumnoDTO(Alumno alumnoConCertificado, DateTime hoy)
+        {
+            AlumnoId = alumnoConCertificado.Id;
+            Alumno = alumnoConCertificado;
+            FechaEmision = hoy;
+        }
+
         [Required(ErrorMessage = "El alumno es necesario")]
         public int AlumnoId { get; set; }
         public Alumno Alumno { get; set; }

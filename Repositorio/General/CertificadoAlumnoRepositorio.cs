@@ -21,6 +21,7 @@ using WebITSC.DB.Data;
 using WebITSC.DB.Data.Entity;
 using WebITSC.Shared.General.DTO;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace Repositorio.General
 {
@@ -32,22 +33,10 @@ namespace Repositorio.General
             this.context = context;
         }
 
-        public async Task<ActionResult<GetDatosCertificadosDTO>> SelectDatosCertificado(string? nombre, string? apellido, string? documento)
+        public async Task<ActionResult<GetDatosCertificadosDTO>> SelectDatosCertificado(string documento)
         {
-            var query = context.Alumnos.AsQueryable();
-
-
-            if (!string.IsNullOrWhiteSpace(nombre))
-                query = query.Where(a => a.Usuario.Persona.Nombre.Contains(nombre));
-
-            if (!string.IsNullOrWhiteSpace(apellido))
-                query = query.Where(a => a.Usuario.Persona.Apellido.Contains(apellido));
-
-            if (!string.IsNullOrWhiteSpace(documento))
-                query = query.Where(a => a.Usuario.Persona.Documento.Contains(documento));
-
-
-
+            var query = context.Alumnos.Where(a => a.Usuario.Persona.Documento.Contains(documento));
+            
             var datos = await query.Select(a => new GetDatosCertificadosDTO
             {
                 ApellidoyNombre = a.Usuario.Persona.Apellido + " " + a.Usuario.Persona.Nombre,
@@ -113,8 +102,6 @@ namespace Repositorio.General
                             }).ToList(),
                 Fecha = DateOnly.FromDateTime(DateTime.Now)
             }).FirstOrDefaultAsync();
-
-
 
             return datos;
 
@@ -191,7 +178,13 @@ namespace Repositorio.General
 			}
 		}
 
-		private static string NumeroANombre(int numero)
+        public async Task<ActionResult<Alumno>> SelectAlumnoByDoc(string documento)
+        {
+            Alumno sel = await context.Alumnos.FirstOrDefaultAsync(x => x.Usuario.Persona.Documento == documento);
+            return sel;
+        }
+
+        private static string NumeroANombre(int numero)
         {
             switch (numero)
             {
