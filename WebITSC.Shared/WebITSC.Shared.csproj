@@ -28,10 +28,4 @@
     <ProjectReference Include="..\WebITSC.DB\WebITSC.DB.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Administracion\" />
-    <Folder Include="Alumno\" />
-    <Folder Include="Docente\" />
-  </ItemGroup>
-
 </Project>

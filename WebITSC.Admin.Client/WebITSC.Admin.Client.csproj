@@ -7,6 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Pages\Alumnos\**" />
+    <Compile Remove="Pages\Docentes\**" />
+    <Content Remove="Pages\Alumnos\**" />
+    <Content Remove="Pages\Docentes\**" />
+    <EmbeddedResource Remove="Pages\Alumnos\**" />
+    <EmbeddedResource Remove="Pages\Docentes\**" />
+    <None Remove="Pages\Alumnos\**" />
+    <None Remove="Pages\Docentes\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.10" PrivateAssets="all" />
   </ItemGroup>
@@ -14,11 +25,6 @@
   <ItemGroup>
     <ProjectReference Include="..\WebITSC.DB\WebITSC.DB.csproj" />
     <ProjectReference Include="..\WebITSC.Shared\WebITSC.Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Pages\Docentes\" />
-    <Folder Include="Pages\Alumnos\" />
   </ItemGroup>
 
 </Project>
