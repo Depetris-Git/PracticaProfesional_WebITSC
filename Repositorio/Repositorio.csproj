@@ -7,9 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Administracion\" />
-    <Folder Include="Alumnos\" />
-    <Folder Include="Profesores\" />
+    <Compile Remove="Alumnos\**" />
+    <Compile Remove="Profesores\**" />
+    <EmbeddedResource Remove="Alumnos\**" />
+    <EmbeddedResource Remove="Profesores\**" />
+    <None Remove="Alumnos\**" />
+    <None Remove="Profesores\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,6 +31,12 @@
   <ItemGroup>
     <ProjectReference Include="..\WebITSC.DB\WebITSC.DB.csproj" />
     <ProjectReference Include="..\WebITSC.Shared\WebITSC.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Alumno\" />
+    <Folder Include="Administracion\" />
+    <Folder Include="Docente\" />
   </ItemGroup>
 
 </Project>
