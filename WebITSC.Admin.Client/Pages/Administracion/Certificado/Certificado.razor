@@ -6,9 +6,9 @@
 
 <form>
     <p> <label>Ingrese el documento del alumno:</label> </p>
-    <p> <input type="text" @bind="documento"/> </p>
+    <p> <input type="text" @bind="documento" /> </p>
 
-    
+
     <!-- Label de error para campo vacío -->
     @if (!string.IsNullOrEmpty(errorMessage))
     {
@@ -48,7 +48,7 @@
             {
                 errorMessage = "Documento no encontrado en la base de datos.";
             }
-            
+
         }
         else
         {
@@ -56,7 +56,7 @@
             errorMessage = "Ingrese un documento válido.";
         }
 
-        
+
     }
 }
 

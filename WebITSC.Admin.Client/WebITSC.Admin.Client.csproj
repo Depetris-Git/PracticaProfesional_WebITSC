@@ -16,4 +16,9 @@
     <ProjectReference Include="..\WebITSC.Shared\WebITSC.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pages\Docentes\" />
+    <Folder Include="Pages\Alumnos\" />
+  </ItemGroup>
+
 </Project>

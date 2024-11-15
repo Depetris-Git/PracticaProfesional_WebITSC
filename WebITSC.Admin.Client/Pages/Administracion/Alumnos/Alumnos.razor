@@ -129,9 +129,9 @@
         <InputCheckbox class="form-check-input" id="TieneCUS" @bind-Value="CUSBool" />
     </div>
 
-   @*   <div class="form-group">
-        <label for="Cohorte">Cohorte</label>
-        <InputNumber class="form-control" id="Edad" @bind-Value="crearAlumno.Cohorte" />
+    @*   <div class="form-group">
+    <label for="Cohorte">Cohorte</label>
+    <InputNumber class="form-control" id="Edad" @bind-Value="crearAlumno.Cohorte" />
     </div>  *@
 
     <button type="submit" class="btn btn-primary">Crear Alumno</button>
@@ -179,7 +179,7 @@
         set => crearAlumno.CUS = value ? "Sí" : "No";
     }
 
-  
+
     // Este método se ejecuta al cargar la página
     protected override async Task OnInitializedAsync()
     {
@@ -215,23 +215,3 @@
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
