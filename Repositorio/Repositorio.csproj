@@ -33,10 +33,4 @@
     <ProjectReference Include="..\WebITSC.Shared\WebITSC.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Alumno\" />
-    <Folder Include="Administracion\" />
-    <Folder Include="Docente\" />
-  </ItemGroup>
-
 </Project>
